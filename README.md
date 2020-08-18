@@ -4,7 +4,8 @@ Demo: [https://sharepic.spd-waghaeusel.de](https://sharepic.spd-waghaeusel.de)
 Admin-Oberfläche: /admin.php
 
 ## Voraussetzungen
-PHP 5  >= 5.3.0, PHP 7
+- PHP 5  >= 5.3.0, PHP 7
+- HTTPS
 
 ## Lizenzinformationen - License information
 **Der Programmcode aller PHP-Dateien unterliegt der GNU General Public License.**
