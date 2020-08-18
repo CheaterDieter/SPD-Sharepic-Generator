@@ -298,7 +298,7 @@ elseif ($ok == 1) {
 
 	<div class="legal">
 	<br><br>
-	<div class="smalltext"><br>SPD Sharepic-Generator Version <?php echo ($ver); ?> entwickelt von David Heger, 2020<br>Diese Software ist OpenSource und unterliegt der GNU General Public License.<br><a href="https://github.com/CheaterDieter/Sharepic-Generator">Zum GitHub-Projekt</a><br><br><?php echo ($conf_copyright); ?><br><br></div>
+	<div class="smalltext"><br>SPD Sharepic-Generator Version <?php echo ($ver); ?> entwickelt von David Heger, 2020<br>Diese Software ist OpenSource und unterliegt der GNU General Public License.<br><a href="https://github.com/CheaterDieter/SPD-Sharepic-Generator">Zum GitHub-Projekt</a><br><br><?php echo ($conf_copyright); ?><br><br></div>
 	</div>
 
 
