@@ -1,7 +1,9 @@
 # Sharepic-Generator
 Demo: [https://sharepic.spd-waghaeusel.de](https://sharepic.spd-waghaeusel.de)
 
-Admin-Oberfläche: /admin.php
+Admin-Oberfläche: admin.php
+Weitere Einstellungen: data/config.php
+**Sicherheitshinweis: Unbedingt das Passwort in config.php anpassen!**
 
 ## Voraussetzungen
 - PHP 5  >= 5.3.0, PHP 7
