@@ -1,5 +1,5 @@
 # Sharepic-Generator
-Demo: [https://sharepic.spd-waghaeusel.de](www.sharepic.spd-waghaeusel.de)
+Demo: [https://sharepic.spd-waghaeusel.de](https://sharepic.spd-waghaeusel.de)
 
 Admin-Oberfläche: /admin.php
 
