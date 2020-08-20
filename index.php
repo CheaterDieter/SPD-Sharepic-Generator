@@ -29,7 +29,7 @@
     Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
     Programm erhalten haben. Wenn nicht, siehe <https://www.gnu.org/licenses/>. 
 */  
-$ver = "1.5";
+$ver = "1.6";
 
 include "data/config.php";
 $db = new SQLite3("data/priv/database.sqlite");
