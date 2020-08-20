@@ -35,6 +35,7 @@ $path_background = "data/background.jpg";
 $path_logo = "data/logo.png";
 $headline = $conf_std_headline;
 $subline1 = str_replace ("%br%", "\n", $conf_std_subline);
+$id_auth = FALSE;
 if (isset($_GET["hash"])){
 	if ($_GET["hash"] == "") {
 		header ("Location: index.php");
@@ -48,10 +49,10 @@ if (isset($_GET["hash"])){
 	unset($db);
 	
 	if ($id == FALSE){
-	{
-		header ("Location: index.php");
-		die ("Hash ungültig!");
-	};
+		{
+			header ("Location: index.php");
+			die ("Hash ungültig!");
+		};
 	}
 }
 elseif(isset($_GET["id"])){
@@ -69,6 +70,8 @@ elseif(isset($_GET["id"])){
 		die ("ID ungültig!");
 	}
 	unset($db);
+	
+	$id_auth = TRUE;
 
 	$target_dir = "up";
 	//$target_file = $target_dir."/bk.jpg";
@@ -363,15 +366,47 @@ else {
 imagedestroy ($dest_zoom);
 
 if(!$dest){echo "Fehler (2)! ID ungültig?"; exit;}
-
+/*
 $image_kasten = imagecreatefromjpeg($path_kasten);
+*/
 
+$i = substr_count($subline1, "\n");
+$gesamt_kastenhoehe = 245 + 86*$i;
+if ($subline1 == "") {$gesamt_kastenhoehe = 150;}
+if (substr($subline1, -1) == "\n") {
+	$gesamt_kastenhoehe = $gesamt_kastenhoehe-86;
+	$i = $i - 1;
+}
+
+$image_kasten = imagecreatetruecolor (1385, $gesamt_kastenhoehe);
+$bkcolor = imagecolorallocate ($image_kasten,255,255,255);
+imagefill ($image_kasten,0,0,$bkcolor);
+
+// Kasten-Icon einfügen
+$image_kasten_icon = imagecreatefrompng("data/priv/icon-kasten.png");
+
+if ($subline1 == "") {
+	$image_kasten_icon_kantenlange = 150;
+} else {
+	$image_kasten_icon_kantenlange = 250; // 250
+}
+$image_logo_x = 0;
+
+if (isset ($_GET["prev"])){
+	imagecopyresized ($image_kasten, $image_kasten_icon, 1385-$image_kasten_icon_kantenlange,$gesamt_kastenhoehe-$image_kasten_icon_kantenlange, 0,0, $image_kasten_icon_kantenlange,$image_kasten_icon_kantenlange,imagesx ($image_kasten_icon),imagesy ($image_kasten_icon));
+} else{
+	imagecopyresampled ($image_kasten, $image_kasten_icon, 1385-$image_kasten_icon_kantenlange,$gesamt_kastenhoehe-$image_kasten_icon_kantenlange, 0,0, $image_kasten_icon_kantenlange,$image_kasten_icon_kantenlange,imagesx ($image_kasten_icon),imagesy ($image_kasten_icon));
+}
+
+
+// Text einfügen
 $color = imagecolorallocate($image_kasten, 227, 6, 19);
 imagettftext($image_kasten, 55, 0, 40, 100, $color, realpath("data/priv/TheSans-B9Black.otf"), $headline);
 imagettftext($image_kasten, 55, 0, 40, 190, $color, realpath("data/priv/TheSans-B7BoldItalic.otf"), $subline1);
 
-$image_logo = imagecreatefrompng($path_logo);
 
+
+$image_logo = imagecreatefrompng($path_logo);
 $logoxpos = 30;
 if ($rechts == 1) {
 	$logoxpos = $bk_size[0] - $logobreite -30;
@@ -388,13 +423,13 @@ if ($logobreite > 0){
 
 
 $kastenbreite = (1385 * $groessetext/100)/(1500/$bk_size[0]);
-$kastenhoehe = (331 * $groessetext/100)/(1500/$bk_size[0]);
+$kastenhoehe = ($gesamt_kastenhoehe * $groessetext/100)/(1500/$bk_size[0]);
 
 if ($groessetext > 0){
 	if (isset ($_GET["prev"])){
-		imagecopyresized($dest, $image_kasten, ($bk_size[0]-$kastenbreite)/2, $bk_size[1]-$kastenhoehe-40, 0, 0, $kastenbreite, $kastenhoehe,1385,331);
+		imagecopyresized($dest, $image_kasten, ($bk_size[0]-$kastenbreite)/2, $bk_size[1]-$kastenhoehe-40, 0, 0, $kastenbreite, $kastenhoehe,1385,$gesamt_kastenhoehe);
 	} else{
-		imagecopyresampled($dest, $image_kasten, ($bk_size[0]-$kastenbreite)/2, $bk_size[1]-$kastenhoehe-40, 0, 0, $kastenbreite, $kastenhoehe,1385,331);
+		imagecopyresampled($dest, $image_kasten, ($bk_size[0]-$kastenbreite)/2, $bk_size[1]-$kastenhoehe-40, 0, 0, $kastenbreite, $kastenhoehe,1385,$gesamt_kastenhoehe);
 	}
 }
 
@@ -447,20 +482,56 @@ if (isset ($_GET["prev"])){
 
 	imagedestroy($dest);
 	imagedestroy($smallver);
-} else {
-	if (!isset ($_GET["debug"])){header('Content-Type: image/jpeg');}
+}
+else {
 	$db = new SQLite3("data/priv/database.sqlite");
 	$db->busyTimeout(5000);	
-	if (isset ($_GET["download"])){
-		header('Content-Disposition: attachment; filename="Sharepic-'.substr ($db->querySingle('SELECT "Hash" FROM "sharepics" WHERE "ID" = "'.$id.'" '), 0, 5).'.jpg"');
-	} else {
-		header('Content-Disposition: inline; filename="Sharepic-'.substr ($db->querySingle('SELECT "Hash" FROM "sharepics" WHERE "ID" = "'.$id.'" '), 0, 5).'.jpg"');
-	}
-	unset($db);	    
-	
-	imagejpeg($dest, NULL, 100);
+	$hash = $db->querySingle('SELECT "Hash" FROM "sharepics" WHERE "ID" = "'.$id.'" ');
+	unset($db);
 
-	imagedestroy($dest);
+	
+	
+	if (isset ($_GET["archiv"]) && $id_auth == TRUE && $conf_archiv==1){ // Bild archivieren
+		$db = new SQLite3("data/priv/database.sqlite");
+		$db->busyTimeout(5000);	
+		$result = $db->query('SELECT * FROM "sharepics" WHERE "ID"="'.$ins.'"');
+		while ($row = $result->fetchArray())
+		{
+			unlink ($row['Pfad_Hintergrund']);
+			unlink ($row['Pfad_Logo']);
+			$db->exec('DELETE FROM "sharepics" WHERE "ID"="'.$row['ID'].'"');
+		}
+		
+		$laenge_id = 5;
+		$id = substr (bin2hex (random_bytes($laenge_id)), 0,$laenge_id);
+		while ($db->querySingle('SELECT * FROM "archiv" WHERE "Hash" = "'.$id.'" ') != FALSE){
+			// ID schon vergeben -> neue generieren
+			$laenge_id = $laenge_id + 1;
+			$id = substr (bin2hex (random_bytes($laenge_id)), 0,$laenge_id);
+		}		
+				
+		$db->exec('INSERT INTO "archiv" ("time","IP","Hash", "Token") VALUES ("'.time().'","'.$_SERVER['REMOTE_ADDR'].'","'.$id.'", "'.hash ("sha3-224", $id.bin2hex(random_bytes(200))).'")');
+		
+		unset($db);
+
+	
+		imagejpeg($dest, "archiv/".$id.".jpg", 80);
+		imagedestroy($dest);
+		
+		
+		include "remove.php?id=".$id;
+		
+		header ("Location: index.php?archivgesetzt&id=".$id);
+	} else {
+		if (!isset ($_GET["debug"])){header('Content-Type: image/jpeg');}
+		if (isset ($_GET["download"])){		
+			header('Content-Disposition: attachment; filename="Sharepic-'.substr ($hash, 0, 5).'.jpg"');
+		} else {
+			header('Content-Disposition: inline; filename="Sharepic-'.substr ($hash, 0, 5).'.jpg"');
+		}		
+		imagejpeg($dest, NULL, 100);
+		imagedestroy($dest);
+	}
 
 }
 

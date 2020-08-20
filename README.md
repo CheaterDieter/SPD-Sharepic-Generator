@@ -8,7 +8,7 @@ Weitere Einstellungen: data/config.php
 **Sicherheitshinweis: Unbedingt das Passwort in config.php anpassen!**
 
 ## Voraussetzungen
-- PHP 5  >= 5.3.0, PHP 7
+- PHP 7
 - HTTPS
 
 ## Lizenzinformationen - License information

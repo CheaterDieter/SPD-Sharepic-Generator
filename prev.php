@@ -45,7 +45,28 @@ if(isset($_GET["logo"])){
 	else {
 		die ("ID fehlt!");
 	}
+	/*
+		function drawImage(Imagick $i) 
+		{
+			$i->setImageFormat("png");
+			header("Content-Type: image/" . $i->getImageFormat());
+			echo $i;
+			exit;
+		}
 
+		$o = new Imagick($prev);
+		$o->setImageBackgroundColor('white'); // handle tranparent images
+		$o = $o->flattenImages(); // flatten after setting background
+		$o->blurImage(5, 30);
+		$o->whiteThresholdImage( "#F8F8F8" );
+		$o->blackThresholdImage( "#FFFFFF" );
+		$o->edgeImage(5);
+		$o->negateImage(false);
+		$o->paintTransparentImage($o->getImagePixelColor(0, 0), 0, 2000);
+		$o->colorizeImage("red", 1);
+
+		drawImage($o);
+	*/
 
 	//echo ($prev);
 	// maximale Breite und Höhe

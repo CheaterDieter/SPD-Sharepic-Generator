@@ -148,7 +148,7 @@ if($login_passwort == "123456"){
 }
 ?>
 
-<a href="admin.php">Sharepic Übersicht</a><br><a href="admin.php?vorlagen">Vorlagen bearbeiten</a><br><hr>
+<a href="admin.php">Sharepic Übersicht</a><br><a href="admin.php?vorlagen">Vorlagen bearbeiten</a><br><a href="admin.php?archiv">Archiv ansehen</a><br><hr>
 <?php
 if (isset ($_GET["vorlagen"])){
 	if (isset ($_GET["del"]) && isset($_GET["nr"])){
@@ -214,7 +214,7 @@ if (isset ($_GET["vorlagen"])){
 	
 	?>
 	<b>Vorlagen</b><br>
-	<a href="vorlagen" target="_blank">vorhandene Bilddateien ansehen</a><br>
+	<a href="data/vorlagen" target="_blank">vorhandene Bilddateien ansehen</a><br>
 	<a href="phpliteadmin.php" target="_blank">phpLiteAdmin</a><br><br>
 	<table>
 	  <tr>
@@ -257,17 +257,6 @@ if (isset ($_GET["vorlagen"])){
 		echo ('<td><a href=admin.php?vorlagen&del&nr='.$i.'>löschen</a></td>');
 		
 		$i = $i+1;
-	//	echo ("<tr>");
-	//	echo ('<td><a href= "/sharepic.php?hash='.$row['Hash'].'" target="_blank"><img width="200" src="/sharepic.php?prev&id='.$row['ID'].'"></img></a></td>');
-		
-	//	echo ("<td>".date("Y-m-d H:i:s",$row['Ablauf']));
-	//	if ($row['Ablauf'] <= time()) {
-	//		echo ("<br>abgelaufen");
-		//}
-		//echo ("</td>");
-		//echo ("<td>".$row['IP']."</td>");
-		//echo ('<td><a href="remove.php?admin&id='.$row['ID'].'">Löschen</a></td>');
-		
 		
 		echo ("</tr>");
 	}	
@@ -289,6 +278,33 @@ if (isset ($_GET["vorlagen"])){
 
 <?php
 }
+elseif (isset ($_GET["archiv"])){
+	?>
+	<b>Archiv</b><br>
+	<table>
+	  <tr>
+		<th width=220>Bild</th>
+		<th width=150>archiviert am</th>
+		<th width=100>IP</th>
+		<th width=100>Löschen</th>
+	  </tr>
+	<?php
+	$archivgrosse = 0;
+	$result = $db->query('SELECT * FROM "archiv"');
+	while ($row = $result->fetchArray())
+	{
+		$archivgrosse = $archivgrosse + filesize('archiv/'.$row['Hash'].'.jpg');
+		echo ("<tr>");
+		echo ('<td><a href= "archiv/'.$row['Hash'].'.jpg" target="_blank"><img width="200" src="archiv/'.$row['Hash'].'.jpg"></a></td>');
+		echo ("<td>".date("Y-m-d H:i:s",$row['time']));
+		echo ("</td>");
+		echo ("<td>".$row['IP']."</td>");
+		echo ('<td><a href="remove.php?archiv&tk='.$row['Token'].'">Löschen</a></td>');
+		echo ("</tr>");
+	}
+	echo ("</table>");
+	echo ("<br> Größe des Archivs: ".round ($archivgrosse/1048576,2)." MB / ".round ($archivgrosse/1073741824,3)." GB");
+}
 else {
 	echo ("Abfrage um ".date("Y-m-d H:i:s"));
 	?>
@@ -304,7 +320,7 @@ else {
 	<table>
 	  <tr>
 		<th width=220>Bild</th>
-		<th width=220>ID</th>
+		<th width=150>ID</th>
 		<th width=150>Ablauf</th>
 		<th width=150>IP</th>
 		<th width=100>Löschen</th>
@@ -315,7 +331,7 @@ else {
 	while ($row = $result->fetchArray())
 	{
 		echo ("<tr>");
-		echo ('<td><a href= "sharepic.php?hash='.$row['Hash'].'" target="_blank"><img width="200" src="sharepic.php?prev&id='.$row['ID'].'"></img></a></td>');
+		echo ('<td><a href= "sharepic.php?hash='.$row['Hash'].'" target="_blank"><img width="200" src="sharepic.php?prev&id='.$row['ID'].'"></a></td>');
 		echo ("<td>".$row['ID']."</td>");
 		echo ("<td>".date("Y-m-d H:i:s",$row['Ablauf']));
 		if ($row['Ablauf'] <= time()) {

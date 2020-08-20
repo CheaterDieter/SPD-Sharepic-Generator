@@ -65,6 +65,24 @@ while (($f = $dirHandle->read()) != false) {
 		}
     }
 }
+
+echo ("<br><br>--Verwaiste Dateien im Archiv--<br>");
+$dirHandle = dir("./archiv");
+ 
+// Verzeichnis Datei für Datei lesen
+while (($f = $dirHandle->read()) != false) {
+   // Nur ausgeben, wenn nicht . oder ..
+    if ($f != "." && $f != ".." && $f != "index.php"){
+		$hash = str_replace (".jpg", "", $f);
+		$f = "archiv/".$f;
+		$result = $db->querySingle('SELECT * FROM "archiv" WHERE "Hash" = "'.$hash.'" ');
+		if ($result == FALSE){
+			echo ($f." - gelöscht<br>");
+			unlink ($f);
+			}
+		
+    }
+}
  
 // Verzeichnis wieder schließen
 $dirHandle->close();

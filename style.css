@@ -38,7 +38,7 @@ textarea {
 	font-size: 100%;
 	font-family: the-sans;
 	width: 350px;
-	height: 46px;
+	height: 69px;
 }
 a:link, a:visited{
 	color: #E30613;
@@ -215,6 +215,9 @@ div.headvorlage {
 	margin-bottom:0;
 	font-family: the-sansb;
 	font-size: 100%;
+}
+div.hidden {
+	display: none;
 }
 h1 {
 	font-family: the-sansb;

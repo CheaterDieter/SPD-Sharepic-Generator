@@ -30,9 +30,11 @@
     Programm erhalten haben. Wenn nicht, siehe <https://www.gnu.org/licenses/>. 
 */  
 
-$db = new SQLite3("data/priv/database.sqlite");
+
 
 if(isset($_GET["id"])){
+	$db = new SQLite3("data/priv/database.sqlite");
+	$db->busyTimeout(5000);
 	if ($_GET["id"] == "") {die ("keine ID");}
 	if(strpos($_GET["id"],"'") != false or strpos($_GET["id"],'"') != false  or strpos($_GET["id"],'’')  != false){die ("FEHLER<br>Ein potentieller Angriffsversuch auf diese Webseite wurde erkannt und blockiert.<br>Wenn dieser Fehler willkürlich auftritt, benachrichtichtigen Sie bitte den Administrator per Mail an sharepic@spd-waghaeusel.de");}
 	$ins = SQLite3::escapeString ($_GET["id"]);
@@ -41,10 +43,10 @@ if(isset($_GET["id"])){
 	$result = $db->querySingle('SELECT "Pfad_Logo" FROM "sharepics" WHERE "ID" = "'.$ins.'" ');
 	unlink ($result);
 	$db->exec('DELETE FROM "sharepics" WHERE "ID"="'.$ins.'"');
-	
+	unset($db);
 	
 	if (isset($_GET["weiter"])){
-		header ("Location: index.php?ok&id=SPD");
+		header ("Location: index.php?ok");
 	}
 	else {
 		if (isset($_GET["admin"])){
@@ -53,7 +55,23 @@ if(isset($_GET["id"])){
 			header ("Location: index.php");
 		}
 	}
-} else {
+}
+elseif(isset($_GET["archiv"]) && isset($_GET["tk"])){
+	if(strpos($_GET["archiv"],"'") != false or strpos($_GET["archiv"],'"') != false  or strpos($_GET["archiv"],'’')  != false){die ("FEHLER<br>Ein potentieller Angriffsversuch auf diese Webseite wurde erkannt und blockiert.<br>Wenn dieser Fehler willkürlich auftritt, benachrichtichtigen Sie bitte den Administrator per Mail an sharepic@spd-waghaeusel.de");}
+	if(strpos($_GET["tk"],"'") != false or strpos($_GET["tk"],'"') != false  or strpos($_GET["tk"],'’')  != false){die ("FEHLER<br>Ein potentieller Angriffsversuch auf diese Webseite wurde erkannt und blockiert.<br>Wenn dieser Fehler willkürlich auftritt, benachrichtichtigen Sie bitte den Administrator per Mail an sharepic@spd-waghaeusel.de");}
+	
+	$ins = SQLite3::escapeString ($_GET["tk"]);
+	
+	$db = new SQLite3("data/priv/database.sqlite");
+	$db->busyTimeout(5000);	
+	$result = $db->querySingle('SELECT "Hash" FROM "archiv" WHERE "Token" = "'.$ins.'" ');
+	unlink ("archiv/".$result.".jpg");
+	$db->exec('DELETE FROM "archiv" WHERE "Token"="'.$ins.'"');
+	unset($db);
+	header ("Location: admin.php?archiv");
+}
+
+else {
 	echo ("keine ID angegeben");
 	header ("Location: index.php");
 }
