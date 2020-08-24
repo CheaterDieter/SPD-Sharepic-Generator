@@ -29,7 +29,7 @@
     Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
     Programm erhalten haben. Wenn nicht, siehe <https://www.gnu.org/licenses/>. 
 */  
-$ver = "1.6";
+$ver = "1.7";
 
 include "data/config.php";
 $db = new SQLite3("data/priv/database.sqlite");
@@ -94,10 +94,13 @@ if (!isset ($_GET["impdat"])){
 <body>
 <br><a href="index.php<?php if(isset($_GET["id"])){ echo ("?id=".$_GET["id"]); } ?>"><img id="ico" alt="" width="120" height="120" src="data/icon.jpg"></a>
 <h1><?php echo ($conf_titel); ?></h1>
+<noscript>
+<h2>Bitte aktivieren Sie JavaScript in Ihrem Browser, um diese Seite nutzen zu können.</h2><br><br>
+</noscript>
 <?php
 
 if (isset ($_GET["fehler"])) {
-	echo ("<div class=head>FEHLER: ".$_GET["fehler"]."</div><br><br>");
+	echo ("<h2>FEHLER:</h2><div class=head>".$_GET["fehler"]."</div><br><br>");
 }
 
 if (isset ($_GET["impdat"])) {
@@ -144,7 +147,8 @@ elseif ($ok == 1) {
 	?>
 	<!-- <a href="index.php?design=idnz&id=<?php echo $id; ?>">In die neue Zeit</a>
 	<br><br> -->
-	<form action="sharepic.php?prev&amp;weiter&amp;id=<?php echo $id; ?>" method="post">
+	
+	<form id="settings" target="transFrame" action="sharepic.php?iframe&prev&amp;id=<?php echo $id; ?>" method="post">
 	<div class="links">
 	<?php 
 	$breite = (int)$db->querySingle('SELECT "Breite" FROM "sharepics" WHERE "ID" = "'.$id.'" ');
@@ -158,7 +162,7 @@ elseif ($ok == 1) {
 	$hoehe = $hoehe+(40*$faktor);
 	$hoehe = round($hoehe/4.184782608695652/$faktor);
 	?>
-	<img id="prev" width="350" height="<?php echo ($hoehe); ?>" alt="" src="sharepic.php?prev&amp;id=<?php echo $id; ?>">
+	<iframe scrolling="no" src="sharepic.php?iframe&prev&amp;id=<?php echo $id; ?>" style="border:0px;	width: 360px; height:<?php echo ($hoehe+10); ?>px;" name="transFrame" id="transFrame"></iframe>	
 	<div style="position: absolute;  width: 350px; z-index: -1; top: <?php echo (200+($hoehe/2)); ?>px;">
 		<img width=100 src="lade.gif">
 	</div>
@@ -166,7 +170,9 @@ elseif ($ok == 1) {
 	
 	<?php if ($conf_archiv == 1) { echo '&nbsp;&nbsp;&nbsp;<a href="index.php?archiv&id='.$id.'">archivieren</a>'; } ?>
 	<br><br>
-	<input class="enter" type="submit" value="Eingaben absenden und aktualisieren" name="submit">
+	<div class="hidden" status="hidden">
+	<input class="enter" type="submit" value="Eingaben absenden und aktualisieren">
+	</div>
 	<div class="smalltext"><a href="remove.php?weiter&id=<?php echo ($id); ?>">oder meine Daten löschen und von vorne beginnen</a></div>
 	<br><br><br>
 	<div class=head>VORLAGEN</div><br>
@@ -228,28 +234,28 @@ elseif ($ok == 1) {
 	<div class="rechts">
 	
 	<div class=head>ÜBERSCHRIFT</div>
-	<input type="text" class="headline" id="headline" name="headline" value='<?php echo ($headline); ?>'>
+	<input oninput="absenden()" type="text" class="headline" id="headline" name="headline" value='<?php echo ($headline); ?>'>
 	
 	<br>
 	<br>
 
 	<div class=head>UNTERSCHRIFT</div>
 	<div class="smalltext"><i>Soll der Text über mehrere Zeilen gehen, bitte Umbrüche setzen.</i></div>
-	<textarea id="subline1" name="subline1" rows="3" cols="35"><?php echo ($subline1); ?></textarea>
+	<textarea oninput="absenden()" id="subline1" name="subline1" rows="3" cols="35"><?php echo ($subline1); ?></textarea>
 	
 	<br>
 	<br>
 	
 	<div class=head>LOGO RECHTS POSITIONIEREN</div>
 	<input type="hidden" name="rechts" value="0">
-	<input type="checkbox" id="rechts" value="1" name="rechts" <?php if ($rechts == 1){echo ("checked");} ?> >
+	<input onchange="absenden()" type="checkbox" id="rechts" value="1" name="rechts" <?php if ($rechts == 1){echo ("checked");} ?> >
 	
 	<br>
 	<br>
 	
 	<div class=head>BREITE DES LOGOS</div>
 	<div class="smalltext"><i>auf 0 stellen, um Logo auszublenden</i><br></div>
-	<div class="range"><input type="range" step="20" min="80" max="800" value="<?php echo ($logobreite); ?>" name="logobreite" id="logobreite">
+	<div onchange="absenden()" class="range"><input type="range" step="20" min="80" max="800" value="<?php echo ($logobreite); ?>" name="logobreite" id="logobreite">
 	<br>
 	<div class="smalltext"><span><?php echo ($logobreite); ?></span> Pixel</div></div>
 
@@ -257,7 +263,7 @@ elseif ($ok == 1) {
 	
 	<div class=head>GRÖSSE DER TEXTBOX</div>
 	<div class="smalltext"><i>auf 0 stellen, um Textbox auszublenden</i><br></div>
-		<input type="range" step="10" min="40" max="100" value="<?php echo ($groessetext); ?>" name="groessetext" id="groessetext">
+		<input onchange="absenden()" type="range" step="5" min="40" max="100" value="<?php echo ($groessetext); ?>" name="groessetext" id="groessetext">
 		<br>
 		<div class="smalltext"><div class="range5"><span><?php echo ($groessetext); ?></span> Prozent</div></div>
 	<br>
@@ -273,7 +279,7 @@ elseif ($ok == 1) {
 	?>
 		<div class=head>QUADRATISCH ZUSCHNEIDEN</div>
 		<input type="hidden" name="quad" value="0">
-		<input type="checkbox" id="quad" value="1" name="quad" <?php if ($quad == 1){echo ("checked");} ?> >
+		<input onchange="reload()" type="checkbox" id="quad" value="1" name="quad" <?php if ($quad == 1){echo ("checked");} ?> >
 		<br><br>
 	<?php
 	}
@@ -282,14 +288,16 @@ elseif ($ok == 1) {
 
 	<div class=head>HINTERGRUND ZOOMEN</div>
 
-	<?php if ($quad == 1){
+	<?php
+	$zoomempfehlung = 0;
+	if ($quad == 1){
 	echo ('<div class="smalltext">um schwarzen Rand zu verhindern: mind.');
 	$db = new SQLite3("data/priv/database.sqlite");
 	$db->busyTimeout(5000);	
 	$path_background = $db->querySingle('SELECT "Pfad_Hintergrund" FROM "sharepics" WHERE "ID" = "'.$id.'" ');
 	unset($db);
 	if (!file_exists ($path_background)) {$path_background = "data/background.jpg";}
-	$zoomempfehlung = 0;
+	
 	$bk_size_org = getimagesize($path_background);
 
 	if ($bk_size_org[0] > $bk_size_org[1]) {
@@ -308,16 +316,16 @@ elseif ($ok == 1) {
 	} 
 	?>
 
-	<input type="range" step="10" min="0" max="500" value="<?php echo ($zoom); ?>" name="zoom" id="zoom">
+	<input onchange="absenden()" type="range" step="10" min="<?php if ($quad == 1){echo ($zoomempfehlung);} else {echo "0";} ?>" max="<?php if ($zoomempfehlung < 500) {echo "500";} else {echo $zoomempfehlung+500;} ?>" value="<?php echo ($zoom); ?>" name="zoom" id="zoom">
 	<br>
 	<div class="smalltext"><div class="range2"><span><?php echo ($zoom); ?></span> Pixel</div></div>
 
-	<?php if ($zoom == 0) { ?> <div class="hidden"><?php } ?>
+	<div class="hidden" id="hiddendiv" status="<?php if ($zoom == 0){echo "hidden";}else {echo "visible";}; ?>">
 	<br>
 	<div class=head>HINTERGRUND HORIZONTAL VERSCHIEBEN</div>
 	<div class="smalltext"><i>funktioniert nur bei aktiviertem Zoom</i><br></div>
 	<div class="einr">
-		<input type="range" step="20" min="-500" max="500" value="<?php echo ($horizontal); ?>" name="horizontal" id="horizontal">
+		<input onchange="absenden()" type="range" step="20" min="-500" max="500" value="<?php echo ($horizontal); ?>" name="horizontal" id="horizontal">
 		<br>
 		<div class="smalltext"><div class="range3"><span><?php echo ($horizontal); ?></span> Pixel</div></div>
 	</div>
@@ -325,12 +333,12 @@ elseif ($ok == 1) {
 	<div class=head>HINTERGRUND VERTIKAL VERSCHIEBEN</div>
 	<div class="smalltext"><i>funktioniert nur bei aktiviertem Zoom</i><br></div>
 	<div class="einr">
-		<input type="range" step="20" min="-500" max="500" value="<?php echo ($vertikal); ?>" name="vertikal" id="vertikal">
+		<input onchange="absenden()" type="range" step="20" min="-500" max="500" value="<?php echo ($vertikal); ?>" name="vertikal" id="vertikal">
 		<br>
 		<div class="smalltext"><div class="range4"><span><?php echo ($vertikal); ?></span> Pixel</div></div>
 	</div>
 	
-	<?php if ($zoom != 0) { ?> </div><?php } ?>
+	</div>
 	</div>
 	</div>
 	</form>
@@ -536,6 +544,25 @@ elseif ($ok == 1) {
    		});			
 		
 	});
+	
+	function absenden() {
+        var form = document.getElementById("settings");
+        form.submit();
+		if (document.getElementById('zoom').value == 0){
+			document.getElementById('hiddendiv').setAttribute('status','hidden');
+
+		} else {
+			document.getElementById('hiddendiv').setAttribute('status','visible');
+		}
+		
+	}
+	
+	function reload(){
+		document.getElementById('settings').setAttribute('action','sharepic.php?weiter&prev&id=<?php echo $id; ?>');
+		document.getElementById('settings').setAttribute('target','');
+
+		absenden();
+	}
 </script>
 
 <!-- start feedback button -->

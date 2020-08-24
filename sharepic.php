@@ -31,6 +31,7 @@
 */  
 
 include "data/config.php";
+
 $path_background = "data/background.jpg";
 $path_logo = "data/logo.png";
 $headline = $conf_std_headline;
@@ -74,7 +75,6 @@ elseif(isset($_GET["id"])){
 	$id_auth = TRUE;
 
 	$target_dir = "up";
-	//$target_file = $target_dir."/bk.jpg";
 
 	if (isset ($_GET["vorlage"])){
 	$db = new SQLite3("data/priv/database.sqlite");
@@ -87,13 +87,9 @@ elseif(isset($_GET["id"])){
 			$vorlage_pfad_bk = $row['pfad_bk'];
 			
 			if ($vorlage_name == $_GET["vorlage"] && $vorlage_pfad_logo != "" && $_GET["lade"]=="logo"){
-				//echo ("Copy logo");
-
 				copy ("data/vorlagen/".$vorlage_pfad_logo,$db->querySingle('SELECT "Pfad_Logo" FROM "sharepics" WHERE "ID" = "'.$id.'" '));
-				//die ($vorlage_pfad_logo."|".$db->querySingle('SELECT "Pfad_Logo" FROM "sharepics" WHERE "ID" = "'.$id.'" '));
 			}
 			if ($vorlage_name == $_GET["vorlage"] && $vorlage_pfad_bk != "" && $_GET["lade"]=="bk"){
-				//echo ("Copy bk");
 				copy ("data/vorlagen/".$vorlage_pfad_bk,$db->querySingle('SELECT "Pfad_Hintergrund" FROM "sharepics" WHERE "ID" = "'.$id.'" '));
 				$bk_size = getimagesize("data/vorlagen/".$vorlage_pfad_bk);
 				$db->exec('UPDATE "sharepics" SET "zoom"=0 WHERE "ID"="'.$id.'"');
@@ -102,14 +98,11 @@ elseif(isset($_GET["id"])){
 			}			
 		}			
 	unset($db);		
-		
-
-		
 	}
 
 	if (isset ($_GET["rotate"])){
-			$db = new SQLite3("data/priv/database.sqlite");
-	$db->busyTimeout(5000);
+		$db = new SQLite3("data/priv/database.sqlite");
+		$db->busyTimeout(5000);
 		$path_background = $db->querySingle('SELECT "Pfad_Hintergrund" FROM "sharepics" WHERE "ID" = "'.$id.'" ');
 		if (!file_exists ($path_background)) {
 			copy ("data/background.jpg", $path_background);
@@ -125,9 +118,8 @@ elseif(isset($_GET["id"])){
 			$bk_size = getimagesize($path_background);
 			$db->exec('UPDATE "sharepics" SET "Breite"='.$bk_size[0].' WHERE "ID"="'.$id.'"');
 			$db->exec('UPDATE "sharepics" SET "Hoehe"='.$bk_size[1].' WHERE "ID"="'.$id.'"');		
-		}
-		//die ("rotate");	
-			unset($db);
+		}	
+		unset($db);
 		header('Location: index.php?id='.$id);
 		exit ();
 	}
@@ -145,9 +137,6 @@ elseif(isset($_GET["id"])){
 		imagesavealpha($rotate, true);
 		imagepng($rotate, $path_background, 0);
 		imagedestroy($rotate);
-	
-		//die ("rotate");	
-		
 		header('Location: index.php?id='.$id);
 		exit ();
 	}	
@@ -159,7 +148,6 @@ elseif(isset($_GET["id"])){
 		$tmp_str = base64_encode ($tmp_str);
 		$tmp_str = SQLite3::escapeString ($tmp_str);
 		$db->exec('UPDATE "sharepics" SET "headline"="'.$tmp_str.'" WHERE "ID"="'.$id.'"');
-		//file_put_contents ($target_dir."/headline.txt",$tmp_str);
 	}
 	if (isset ($_POST["subline1"])){
 		$tmp_str = str_replace ("ß","%S%" ,$_POST["subline1"]);
@@ -169,7 +157,6 @@ elseif(isset($_GET["id"])){
 		$tmp_str = base64_encode ($tmp_str);
 		$tmp_str = SQLite3::escapeString ($tmp_str);
 		$db->exec('UPDATE "sharepics" SET "subline1"="'.$tmp_str.'" WHERE "ID"="'.$id.'"');
-		//file_put_contents ($target_dir."/subline1.txt",$tmp_str);
 	}
 	if (isset ($_POST["logobreite"])){
 		$ins = SQLite3::escapeString ($_POST["logobreite"]);
@@ -186,6 +173,7 @@ elseif(isset($_GET["id"])){
 	}	
 	if (isset ($_POST["vertikal"])){
 		$ins = SQLite3::escapeString ($_POST["vertikal"]);
+		$ins = $ins * -1;
 		$db->exec('UPDATE "sharepics" SET "vertikal"="'.$ins.'" WHERE "ID"="'.$id.'"');
 	}	
 	if (isset ($_POST["groessetext"])){
@@ -206,7 +194,6 @@ elseif(isset($_GET["id"])){
 				$db->exec('UPDATE "sharepics" SET "Hoehe"=1500 WHERE "ID"="'.$id.'"');			
 			if ($db->querySingle('SELECT "quad" FROM "sharepics" WHERE "ID" = "'.$id.'" ') == 0){ // wenn Option neu angewählt wurde
 				$db->exec('UPDATE "sharepics" SET "quad"=1 WHERE "ID"="'.$id.'"');
-				//file_put_contents ($target_dir."/quad.txt","1");
 
 				$path_background = $db->querySingle('SELECT "Pfad_Hintergrund" FROM "sharepics" WHERE "ID" = "'.$id.'" ');
 				if (!file_exists ($path_background)) {$path_background = "data/background.jpg";}
@@ -225,7 +212,6 @@ elseif(isset($_GET["id"])){
 				if ($zoomempfehlung == 10) {$zoomempfehlung = 0;}
 				$db->exec('UPDATE "sharepics" SET "zoom"="'.$zoomempfehlung.'" WHERE "ID"="'.$id.'"');
 			}
-			
 		} else {
 			$path_background = $db->querySingle('SELECT "Pfad_Hintergrund" FROM "sharepics" WHERE "ID" = "'.$id.'" ');
 			$bk_size = getimagesize($path_background);
@@ -242,17 +228,17 @@ elseif(isset($_GET["id"])){
 		exit ();
 	}
 }
-	$db = new SQLite3("data/priv/database.sqlite");
-	$db->busyTimeout(5000);
+
+if (isset ($_GET["iframe"]) && isset ($_GET["id"])){
+	echo '<!DOCTYPE html><img src="sharepic.php?prev&dummy='.bin2hex(random_bytes(5)).'&id='.$_GET["id"].'"  style=" position: absolute;left:-0px; top:-0px; width:350px; border-style: solid;color: #FFFFFF; margin-right: 10px;"> ';
+	exit ();
+}
+
+$db = new SQLite3("data/priv/database.sqlite");
+$db->busyTimeout(5000);
 
 $path_background = $db->querySingle('SELECT "Pfad_Hintergrund" FROM "sharepics" WHERE "ID" = "'.$id.'" ');
-
-//$path_logo = "up/".$id."/logo.png";
-//if (!file_exists ($path_logo)) {$path_logo = "logo.png";}
 $path_logo = $db->querySingle('SELECT "Pfad_Logo" FROM "sharepics" WHERE "ID" = "'.$id.'" ');
-
-
-
 
 //SQLITE ABFRAGE
 $result = $db->query('SELECT * FROM "sharepics" WHERE "ID" = "'.$id.'"');
@@ -276,22 +262,18 @@ while ($row = $result->fetchArray())
 		if ($vertikal < 0) { $vertikal = 0- $zoom; } else {$vertikal = $zoom;}
 	}	
 }	
-	unset($db);
 
-
+unset($db);
 
 $path_kasten = "data/priv/kasten.jpg";
-
 $logo_size = getimagesize($path_logo);
-
 if(!$logo_size){echo "Fehler (1)!"; exit;}
 
 $bk_size = getimagesize($path_background);
-
-	$bk_size_org[0] = $bk_size[0];
-	$bk_size_org[1] = $bk_size[1];
-	
+$bk_size_org[0] = $bk_size[0];
+$bk_size_org[1] = $bk_size[1];
 $zoomempfehlung = 0;
+
 if ($quad == 0){
 	$dest = imagecreatefromjpeg($path_background);
 	imagesavealpha($dest, true);
@@ -315,60 +297,49 @@ if ($quad == 0){
 		$zoomempfehlung = $zoomempfehlung*$bk_size_org[1]/$bk_size_org[0]/2;
 	}	
 }
-	$db = new SQLite3("data/priv/database.sqlite");
-	$db->busyTimeout(5000);
+
+$db = new SQLite3("data/priv/database.sqlite");
+$db->busyTimeout(5000);
 $db->exec('UPDATE "sharepics" SET "Breite"='.$bk_size[0].' WHERE "ID"="'.$id.'"');
 $db->exec('UPDATE "sharepics" SET "Hoehe"='.$bk_size[1].' WHERE "ID"="'.$id.'"');
 unset($db);
 
 if ($quad == 0){
-$dest_zoom = imagecreatefromjpeg($path_background);
+	$dest_zoom = imagecreatefromjpeg($path_background);
 } else {
 	$dest_zoom = imagecreatetruecolor(1500, 1500);
 	$tmp = imagecreatefromjpeg($path_background);
 
-if (isset ($_GET["prev"])){
-	imagecopyresized($dest_zoom,$tmp, (($bk_size[0]-$bk_size_org[0])/2),(($bk_size[1]-$bk_size_org[1])/2),0,0,1500,1500,1500,1500);
-} else {
-	imagecopyresampled($dest_zoom,$tmp, (($bk_size[0]-$bk_size_org[0])/2),(($bk_size[1]-$bk_size_org[1])/2),0,0,1500,1500,1500,1500);
-
-}
+	if (isset ($_GET["prev"])){
+		imagecopyresized($dest_zoom,$tmp, (($bk_size[0]-$bk_size_org[0])/2),(($bk_size[1]-$bk_size_org[1])/2),0,0,1500,1500,1500,1500);
+	} else {
+		imagecopyresampled($dest_zoom,$tmp, (($bk_size[0]-$bk_size_org[0])/2),(($bk_size[1]-$bk_size_org[1])/2),0,0,1500,1500,1500,1500);
+	}
 	imagedestroy ($tmp);
 }
-//imagecopyresized($dest,$dest_zoom, 0,0,0,0,1500,1500,1500,1500);
-
-
-
 
 $new_width = $width * $zoom / 100;
 $new_height = $height * $zoom / 100;
 
-//imagecopyresampled($dest, $dest_zoom, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
-
-//imagecopyresized($dest,$dest_zoom, 0-$zoom-$horizontal,0-$zoom-$vertikal,0,0,$bk_size[0]+($zoom*2*$height/$width),$bk_size[1]+($zoom*2*$height/$width),$bk_size[0],$bk_size[1]);
-
+// Zoom
 if ($quad == 0){
 	if (isset ($_GET["prev"])){
-		imagecopyresized($dest,$dest_zoom, 0-$zoom-$horizontal,0-$zoom-$vertikal,0,0,$bk_size[0]+($zoom*2),$bk_size[1]+($zoom*2*$height/$width),$bk_size[0],$bk_size[1]);
+		imagecopyresized($dest,$dest_zoom, 0-$zoom-$horizontal,0-($zoom)-$vertikal,0,0,$bk_size[0]+($zoom*2),$bk_size[1]+($zoom*2),$bk_size[0],$bk_size[1]);
 	} else{
-		imagecopyresampled($dest,$dest_zoom, 0-$zoom-$horizontal,0-$zoom-$vertikal,0,0,$bk_size[0]+($zoom*2),$bk_size[1]+($zoom*2*$height/$width),$bk_size[0],$bk_size[1]);
+		imagecopyresampled($dest,$dest_zoom, 0-$zoom-$horizontal,0-($zoom)-$vertikal,0,0,$bk_size[0]+($zoom*2),$bk_size[1]+($zoom*2),$bk_size[0],$bk_size[1]);
 	}
 }
 else {
 	if (isset ($_GET["prev"])){
-		imagecopyresized($dest,$dest_zoom, 0-$zoom-$horizontal,0-$zoom-$vertikal,0,0,$bk_size[0]+($zoom*2*$bk_size[1]/$bk_size[0]),$bk_size[1]+($zoom*2*$bk_size[1]/$bk_size[0]),$bk_size[0],$bk_size[1]);
-	} else{
-		imagecopyresampled($dest,$dest_zoom, 0-$zoom-$horizontal,0-$zoom-$vertikal,0,0,$bk_size[0]+($zoom*2*$bk_size[1]/$bk_size[0]),$bk_size[1]+($zoom*2*$bk_size[1]/$bk_size[0]),$bk_size[0],$bk_size[1]);
+		imagecopyresized($dest,$dest_zoom, 0-$zoom-$horizontal,0-$zoom-$vertikal,0,0,$bk_size[0]+($zoom*2*$bk_size[1]/$bk_size[0]),$bk_size[1]+($zoom*2),$bk_size[0],$bk_size[1]);
+	} else {
+		imagecopyresampled($dest,$dest_zoom, 0-$zoom-$horizontal,0-$zoom-$vertikal,0,0,$bk_size[0]+($zoom*2*$bk_size[1]/$bk_size[0]),$bk_size[1]+($zoom*2),$bk_size[0],$bk_size[1]);
 	}	
 }
-
 
 imagedestroy ($dest_zoom);
 
 if(!$dest){echo "Fehler (2)! ID ungültig?"; exit;}
-/*
-$image_kasten = imagecreatefromjpeg($path_kasten);
-*/
 
 $i = substr_count($subline1, "\n");
 $gesamt_kastenhoehe = 245 + 86*$i;

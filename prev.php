@@ -163,8 +163,8 @@ if(isset($_GET["bk"])){
 	imagejpeg($bild_neu, NULL, 100); 
 }
 elseif(isset($_GET["bkiframe"])){
-	echo '<meta http-equiv="refresh" content="5">';
-	echo '<img src="prev.php?bk&id='.$_GET["id"].'" width="150"> ';
+	echo '<meta http-equiv="refresh" content="1">';
+	echo '<img src="prev.php?bk&id='.$_GET["id"].'"  style="width:350;"> ';
 }
 
 ?>

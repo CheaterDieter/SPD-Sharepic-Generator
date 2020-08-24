@@ -7,6 +7,7 @@
 	font-family: the-sansb;
 	src: url('TheSans-B9Black.woff');
 }
+
 body {
 	margin: auto;
 	width: 750px;
@@ -27,6 +28,8 @@ input {
 }
 input.headline {
 	width: 350px;
+	font-size: 130%;
+
 }
 input.enter {
 	width: 350px;
@@ -38,7 +41,7 @@ textarea {
 	font-size: 100%;
 	font-family: the-sans;
 	width: 350px;
-	height: 69px;
+	height: 55px;
 }
 a:link, a:visited{
 	color: #E30613;
@@ -68,12 +71,8 @@ input[type="checkbox"] {
 	transform: scale(2);
 	margin: 10px;
 }
-input[type=text] {
-	font-size: 1.3em;
-}
-textarea {
-	font-size: 1.3em;
-}
+
+
 
 input[type=range] {
   height: 28px;
@@ -216,7 +215,7 @@ div.headvorlage {
 	font-family: the-sansb;
 	font-size: 100%;
 }
-div.hidden {
+div.hidden[status="hidden"] {
 	display: none;
 }
 h1 {
