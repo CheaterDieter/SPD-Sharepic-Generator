@@ -334,9 +334,10 @@ $new_height = $height * $zoom / 100;
 // Zoom
 if ($quad == 0){
 	if (isset ($_GET["prev"])){
-		imagecopyresized($dest,$dest_zoom, 0-$zoom-$horizontal,0-($zoom)-$vertikal,0,0,$bk_size[0]+($zoom*2),$bk_size[1]+($zoom*2),$bk_size[0],$bk_size[1]);
+		//imagecopyresized($dest,$dest_zoom, 0-$zoom-$horizontal,0-($zoom)-$vertikal,0,0,$bk_size[0]+($zoom*2),$bk_size[1]+($zoom*2),$bk_size[0],$bk_size[1]);
+		  imagecopyresized($dest,$dest_zoom, 0-$zoom-$horizontal,0-($zoom*$height/$width)-$vertikal,0,0,$bk_size[0]+($zoom*2),$bk_size[1]+($zoom*2*$height/$width),$bk_size[0],$bk_size[1]);
 	} else{
-		imagecopyresampled($dest,$dest_zoom, 0-$zoom-$horizontal,0-($zoom)-$vertikal,0,0,$bk_size[0]+($zoom*2),$bk_size[1]+($zoom*2),$bk_size[0],$bk_size[1]);
+		imagecopyresampled($dest,$dest_zoom, 0-$zoom-$horizontal,0-($zoom*$height/$width)-$vertikal,0,0,$bk_size[0]+($zoom*2),$bk_size[1]+($zoom*2*$height/$width),$bk_size[0],$bk_size[1]);
 	}
 }
 else {

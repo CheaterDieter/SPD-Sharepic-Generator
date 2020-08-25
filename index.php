@@ -163,7 +163,7 @@ elseif ($ok == 1) {
 	$hoehe = round($hoehe/4.184782608695652/$faktor);
 	?>
 	<iframe scrolling="no" src="sharepic.php?iframe&prev&amp;id=<?php echo $id; ?>" style="border:0px;	width: 360px; height:<?php echo ($hoehe+10); ?>px;" name="transFrame" id="transFrame"></iframe>	
-	<div style="position: absolute;  width: 350px; z-index: -1; top: <?php echo (200+($hoehe/2)); ?>px;">
+	<div style="position: absolute;  width: 350px; z-index: -1; top: 200px;">
 		<img width=100 src="lade.gif">
 	</div>
 	<a href="sharepic.php?download&hash=<?php echo hash ("sha3-224", $id.$salt); ?>">Download</a>&nbsp;&nbsp;&nbsp;<a href="sharepic.php?hash=<?php echo hash ("sha3-224", $id.$salt); ?>">im Browser öffnen</a>
@@ -299,7 +299,7 @@ elseif ($ok == 1) {
 	<?php
 	$zoomempfehlung = 0;
 	if ($quad == 1){
-	echo ('<div class="smalltext">um schwarzen Rand zu verhindern: mind.');
+	echo ('<div class="hidden" status="hidden"><div class="smalltext">um schwarzen Rand zu verhindern: mind.</div>');
 	$db = new SQLite3("data/priv/database.sqlite");
 	$db->busyTimeout(5000);	
 	$path_background = $db->querySingle('SELECT "Pfad_Hintergrund" FROM "sharepics" WHERE "ID" = "'.$id.'" ');
