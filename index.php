@@ -176,12 +176,12 @@ elseif ($ok == 1) {
 	<div class="smalltext"><a href="remove.php?weiter&id=<?php echo ($id); ?>">oder meine Daten löschen und von vorne beginnen</a></div>
 	<br><br>
 	<table  align="center"><tr>
-	<td>Wähle <br>ein Design:</td>
-	<td><a href="sharepic.php?weiter&design=idnz&id=<?php echo $id; ?>"><img alt="" width=100 src="data/prev-neue-zeit.jpg"><br>In die neue Zeit</a></td>
-	<td><a href="sharepic.php?weiter&design=klar&id=<?php echo $id; ?>"><img alt="" width=100 src="data/prev-klare-worte.jpg"><br>Klare Worte</a></td>
+	<td><div class=head>DESIGN:</div></td>
+	<td><a href="sharepic.php?weiter&design=idnz&id=<?php echo $id; ?>"><img alt="" height=100 width=100 src="data/prev-neue-zeit.jpg"><br>Die neue Zeit</a></td>
+	<td><a href="sharepic.php?weiter&design=klar&id=<?php echo $id; ?>"><img alt="" height=100 width=100 src="data/prev-klare-worte.jpg"><br>Klare Worte</a></td>
 	</tr>
 	</table>
-	<br><br>	
+	<br>	
 	
 	
 	<br>
