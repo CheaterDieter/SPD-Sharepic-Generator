@@ -12,9 +12,9 @@ Weitere Einstellungen: data/config.php
 - HTTPS
 
 ## Lizenzinformationen - License information
-**Der Programmcode aller PHP-Dateien unterliegt der GNU General Public License.**
+**Der Programmcode aller PHP, HTML und CSS-Dateien unterliegt der GNU General Public License.**
 
-**The program code of all PHP files is licensed under the GNU General Public License.**
+**The program code of all PHP, HTML and CSS files is licensed under the GNU General Public License.**
 
 SPD Sharepic-Generator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
