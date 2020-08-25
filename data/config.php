@@ -4,17 +4,17 @@
 $conf_password = "123456";
 
 // Titel der Anwendung
-$conf_titel = "SPD SHAREPIC-GENERATOR";
+$conf_titel = "SPD Sharepic-Generator";
 
 // Beschreibung der Webseite, z.B. für Suchmaschinen
 $conf_website_beschreibung = "Sharepic-Generator „In die neue Zeit“ der SPD Waghäusel";
 
 // Voreingestellte Überschrift bei neuen Sharepics
-$conf_std_headline = "NAZIS NERVEN MEHR ALS WESPEN";
+$conf_std_headline = "SPD Sharepic-Generator";
 
 // Voreingestellte Unterschrift bei neuen Sharepics
 // Um Umbrüche einzufügen, bitte "%br%" verwenden
-$conf_std_subline = "„LEBE SO, DASS DIE AFD%br%ETWAS DAGEGEN HÄTTE“";
+$conf_std_subline = "„Lebe so, dass die AfD%br%etwas dagegen hätte“";
 
 // Copyright-Hinweis
 $conf_copyright = "Die Logos und Grafiken sind durch die Sozialdemokratische Partei Deutschlands und ihre Gliederungen urheberrechtlich geschützt. Sie dürfen nur im Zusammenhang mit Aktivitäten der SPD verwendet werden.";

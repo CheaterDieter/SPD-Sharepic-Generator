@@ -34,7 +34,7 @@ $ver = "1.7";
 include "data/config.php";
 $db = new SQLite3("data/priv/database.sqlite");
 $db->busyTimeout(5000);
-$db-> exec("CREATE TABLE IF NOT EXISTS 'sharepics' ('ID' TEXT, 'headline' TEXT, 'subline1' TEXT, 'Ablauf' INTEGER, 'IP' TEXT, 'Pfad_Hintergrund' TEXT, 'Pfad_Logo' TEXT,'groessetext' INTEGER, 'horizontal' INTEGER, 'logobreite' INTEGER, 'quad' INTEGER, 'rechts' INTEGER, 'vertikal' INTEGER, 'zoom' INTEGER, 'Hash' TEXT, 'Breite' INTEGER, 'Hoehe' INTEGER, 'Salt' TEXT, 'Archiv' INTEGER)");
+$db-> exec("CREATE TABLE IF NOT EXISTS 'sharepics' ('ID' TEXT, 'headline' TEXT, 'subline1' TEXT, 'Ablauf' INTEGER, 'IP' TEXT, 'Pfad_Hintergrund' TEXT, 'Pfad_Logo' TEXT,'groessetext' INTEGER, 'horizontal' INTEGER, 'logobreite' INTEGER, 'quad' INTEGER, 'rechts' INTEGER, 'vertikal' INTEGER, 'zoom' INTEGER, 'Hash' TEXT, 'Breite' INTEGER, 'Hoehe' INTEGER, 'Salt' TEXT, 'Archiv' INTEGER, 'Design' TEXT)");
 $db-> exec("CREATE TABLE IF NOT EXISTS 'vorlagen' ('name' TEXT, 'pfad_logo' TEXT, 'pfad_bk' TEXT, 'beschreibung' TEXT, 'Nr' INTEGER)");
 $db-> exec("CREATE TABLE IF NOT EXISTS 'archiv' ('time' TEXT, 'IP' TEXT, 'Hash' TEXT, 'Token' TEXT)");
 
@@ -58,7 +58,7 @@ while ($db->querySingle('SELECT * FROM "sharepics" WHERE "ID" = "'.$id.'" ') != 
 if (isset($_GET["ok"])){
 	$ablaufzeit = 82800;
 	$salt = bin2hex (random_bytes(3));
-	$db->exec('INSERT INTO "sharepics" ("ID","headline","subline1","Ablauf","IP","Pfad_Hintergrund","Pfad_Logo","groessetext","horizontal","logobreite","quad","rechts","vertikal","zoom","Hash", "Breite", "Hoehe", "Salt") VALUES ("'.$id.'","'.base64_encode ($conf_std_headline).'","'.base64_encode($conf_std_subline).'","'.(time()+ $ablaufzeit) .'","'.$_SERVER['REMOTE_ADDR'].'","up/'.$id.'-bk.jpg","up/'.$id.'-logo.png","100","0","400","0","0","0","0","'.hash ("sha3-224", $id.$salt).'", "1500","1500", "'.$salt.'")');
+	$db->exec('INSERT INTO "sharepics" ("ID","headline","subline1","Ablauf","IP","Pfad_Hintergrund","Pfad_Logo","groessetext","horizontal","logobreite","quad","rechts","vertikal","zoom","Hash", "Breite", "Hoehe", "Salt", "Design") VALUES ("'.$id.'","'.base64_encode ($conf_std_headline).'","'.base64_encode($conf_std_subline).'","'.(time()+ $ablaufzeit) .'","'.$_SERVER['REMOTE_ADDR'].'","up/'.$id.'-bk.jpg","up/'.$id.'-logo.png","100","0","400","0","1","0","0","'.hash ("sha3-224", $id.$salt).'", "1500","1500", "'.$salt.'", "idnz")');
 	if (!file_exists("up/".$id."-logo.png")) {copy ("data/logo.png", "up/".$id."-logo.png");}
 	if (!file_exists("up/".$id."-bk.jpg")) {copy ("data/background.jpg", "up/".$id."-bk.jpg");}
 	header ("Location: index.php?id=".$id);
@@ -92,8 +92,9 @@ if (!isset ($_GET["impdat"])){
 	<?php echo (file_get_contents("data/priv/header.html")); ?>
 </head>
 <body>
-<br><a href="index.php<?php if(isset($_GET["id"])){ echo ("?id=".$_GET["id"]); } ?>"><img id="ico" alt="" width="120" height="120" src="data/icon.jpg"></a>
-<h1><?php echo ($conf_titel); ?></h1>
+<a href="index.php<?php if(isset($_GET["id"])){ echo ("?id=".$_GET["id"]); } ?>"><img id="ico" alt="" width="120" height="120" src="data/icon.jpg"></a>
+<!--<div class="headline"><?php echo ($conf_titel); ?></div>-->
+<br>
 <noscript>
 <h2>Bitte aktivieren Sie JavaScript in Ihrem Browser, um diese Seite nutzen zu können.</h2><br><br>
 </noscript>
@@ -145,8 +146,7 @@ elseif (isset ($_GET["archivgesetzt"])) {
 }
 elseif ($ok == 1) {
 	?>
-	<!-- <a href="index.php?design=idnz&id=<?php echo $id; ?>">In die neue Zeit</a>
-	<br><br> -->
+
 	
 	<form id="settings" target="transFrame" action="sharepic.php?iframe&prev&amp;id=<?php echo $id; ?>" method="post">
 	<div class="links">
@@ -174,7 +174,17 @@ elseif ($ok == 1) {
 	<input class="enter" type="submit" value="Eingaben absenden und aktualisieren">
 	</div>
 	<div class="smalltext"><a href="remove.php?weiter&id=<?php echo ($id); ?>">oder meine Daten löschen und von vorne beginnen</a></div>
-	<br><br><br>
+	<br><br>
+	<table  align="center"><tr>
+	<td>Wähle <br>ein Design:</td>
+	<td><a href="sharepic.php?weiter&design=idnz&id=<?php echo $id; ?>"><img alt="" width=100 src="data/prev-neue-zeit.jpg"><br>In die neue Zeit</a></td>
+	<td><a href="sharepic.php?weiter&design=klar&id=<?php echo $id; ?>"><img alt="" width=100 src="data/prev-klare-worte.jpg"><br>Klare Worte</a></td>
+	</tr>
+	</table>
+	<br><br>	
+	
+	
+	<br>
 	<div class=head>VORLAGEN</div><br>
 	<table>
 		<tr>
@@ -234,14 +244,14 @@ elseif ($ok == 1) {
 	<div class="rechts">
 	
 	<div class=head>ÜBERSCHRIFT</div>
-	<input oninput="absenden()" type="text" class="headline" id="headline" name="headline" value='<?php echo ($headline); ?>'>
+	<input oninput="absenden(1)" type="text" class="headline" id="headline" name="headline" value='<?php echo ($headline); ?>'>
 	
 	<br>
 	<br>
 
 	<div class=head>UNTERSCHRIFT</div>
 	<div class="smalltext"><i>Soll der Text über mehrere Zeilen gehen, bitte Umbrüche setzen.</i></div>
-	<textarea oninput="absenden()" id="subline1" name="subline1" rows="3" cols="35"><?php echo ($subline1); ?></textarea>
+	<textarea oninput="absenden(1)" id="subline1" name="subline1" rows="3" cols="35"><?php echo ($subline1); ?></textarea>
 	
 	<br>
 	<br>
@@ -285,9 +295,7 @@ elseif ($ok == 1) {
 	}
 	?>
 	
-
 	<div class=head>HINTERGRUND ZOOMEN</div>
-
 	<?php
 	$zoomempfehlung = 0;
 	if ($quad == 1){
@@ -544,24 +552,32 @@ elseif ($ok == 1) {
    		});			
 		
 	});
+	var wait = 0;
 	
-	function absenden() {
-        var form = document.getElementById("settings");
-        form.submit();
-		if (document.getElementById('zoom').value == 0){
-			document.getElementById('hiddendiv').setAttribute('status','hidden');
+	async function absenden(delay) {
+		if (wait == 0) {
+			wait = 1;
+			if (delay == 1) {await Sleep(500);}
+			wait = 0;				
+			var form = document.getElementById("settings");
+			form.submit();
+			if (document.getElementById('zoom').value == 0){
+				document.getElementById('hiddendiv').setAttribute('status','hidden');
 
-		} else {
-			document.getElementById('hiddendiv').setAttribute('status','visible');
+			} else {
+				document.getElementById('hiddendiv').setAttribute('status','visible');
+			}	
 		}
-		
 	}
 	
 	function reload(){
 		document.getElementById('settings').setAttribute('action','sharepic.php?weiter&prev&id=<?php echo $id; ?>');
 		document.getElementById('settings').setAttribute('target','');
-
 		absenden();
+	}
+	
+	function Sleep(milliseconds) {
+		return new Promise(resolve => setTimeout(resolve, milliseconds));
 	}
 </script>
 

@@ -37,6 +37,20 @@ $path_logo = "data/logo.png";
 $headline = $conf_std_headline;
 $subline1 = str_replace ("%br%", "\n", $conf_std_subline);
 $id_auth = FALSE;
+
+$design = "idnz";
+if (isset ($_GET["design"]) && $_GET["id"]){
+	if ($_GET["design"] == "klar"){
+		$design = "klar";
+	}
+	if(strpos($_GET["id"],"'") != false or strpos($_GET["id"],'"') != false or strpos($_GET["id"],'’')  != false){die ("FEHLER<br>Ein potentieller Angriffsversuch auf diese Webseite wurde erkannt und blockiert.<br>Wenn dieser Fehler willkürlich auftritt, benachrichtichtigen Sie bitte den Administrator per Mail an sharepic@spd-waghaeusel.de");}
+	$ins = SQLite3::escapeString ($_GET["id"]);		
+	$db = new SQLite3("data/priv/database.sqlite");
+	$db->busyTimeout(5000);		
+	$db->exec('UPDATE "sharepics" SET "design"="'.$design.'" WHERE "ID"="'.$ins.'"');
+	unset($db);
+}
+	
 if (isset($_GET["hash"])){
 	if ($_GET["hash"] == "") {
 		header ("Location: index.php");
@@ -143,16 +157,12 @@ elseif(isset($_GET["id"])){
 
 	if (isset ($_POST["headline"])){
 		$tmp_str = str_replace ("ß","%S%" ,$_POST["headline"]);
-		$tmp_str=mb_strtoupper ($tmp_str);
-		$tmp_str = str_replace ("%S%","ß" ,$tmp_str);
 		$tmp_str = base64_encode ($tmp_str);
 		$tmp_str = SQLite3::escapeString ($tmp_str);
 		$db->exec('UPDATE "sharepics" SET "headline"="'.$tmp_str.'" WHERE "ID"="'.$id.'"');
 	}
 	if (isset ($_POST["subline1"])){
 		$tmp_str = str_replace ("ß","%S%" ,$_POST["subline1"]);
-		$tmp_str=mb_strtoupper ($tmp_str);
-		$tmp_str = str_replace ("%S%","ß" ,$tmp_str);
 		$tmp_str = str_replace ("%br%","\n" ,$tmp_str);
 		$tmp_str = base64_encode ($tmp_str);
 		$tmp_str = SQLite3::escapeString ($tmp_str);
@@ -223,7 +233,6 @@ elseif(isset($_GET["id"])){
 	unset($db);
 	
 	if (isset ($_GET["weiter"])) {
-		
 		header('Location: index.php?id='.$id);
 		exit ();
 	}
@@ -249,6 +258,7 @@ while ($row = $result->fetchArray())
 	$subline1 = str_replace ("%br%","\n" ,$subline1);
 	$groessetext = $row['groessetext'];
 	$zoom = $row['zoom'];
+	$design = $row['Design'];
 
 	$logobreite = $row['logobreite'];
 	$quad = $row['quad'];
@@ -341,74 +351,200 @@ imagedestroy ($dest_zoom);
 
 if(!$dest){echo "Fehler (2)! ID ungültig?"; exit;}
 
-$i = substr_count($subline1, "\n");
-$gesamt_kastenhoehe = 245 + 86*$i;
-if ($subline1 == "") {$gesamt_kastenhoehe = 150;}
-if (substr($subline1, -1) == "\n") {
-	$gesamt_kastenhoehe = $gesamt_kastenhoehe-86;
-	$i = $i - 1;
-}
 
-$image_kasten = imagecreatetruecolor (1385, $gesamt_kastenhoehe);
-$bkcolor = imagecolorallocate ($image_kasten,255,255,255);
-imagefill ($image_kasten,0,0,$bkcolor);
-
-// Kasten-Icon einfügen
-$image_kasten_icon = imagecreatefrompng("data/priv/icon-kasten.png");
-
-if ($subline1 == "") {
-	$image_kasten_icon_kantenlange = 150;
-} else {
-	$image_kasten_icon_kantenlange = 250; // 250
-}
-$image_logo_x = 0;
-
-if (isset ($_GET["prev"])){
-	imagecopyresized ($image_kasten, $image_kasten_icon, 1385-$image_kasten_icon_kantenlange,$gesamt_kastenhoehe-$image_kasten_icon_kantenlange, 0,0, $image_kasten_icon_kantenlange,$image_kasten_icon_kantenlange,imagesx ($image_kasten_icon),imagesy ($image_kasten_icon));
-} else{
-	imagecopyresampled ($image_kasten, $image_kasten_icon, 1385-$image_kasten_icon_kantenlange,$gesamt_kastenhoehe-$image_kasten_icon_kantenlange, 0,0, $image_kasten_icon_kantenlange,$image_kasten_icon_kantenlange,imagesx ($image_kasten_icon),imagesy ($image_kasten_icon));
-}
-
-
-// Text einfügen
-$color = imagecolorallocate($image_kasten, 227, 6, 19);
-imagettftext($image_kasten, 55, 0, 40, 100, $color, realpath("data/priv/TheSans-B9Black.otf"), $headline);
-imagettftext($image_kasten, 55, 0, 40, 190, $color, realpath("data/priv/TheSans-B7BoldItalic.otf"), $subline1);
-
-
-
-$image_logo = imagecreatefrompng($path_logo);
-$logoxpos = 30;
-if ($rechts == 1) {
-	$logoxpos = $bk_size[0] - $logobreite -30;
-}
-
-if ($logobreite > 0){
-	if (isset ($_GET["prev"])){
-		imagecopyresized($dest, $image_logo,  $logoxpos, 30, 0, 0, $logobreite, $logobreite*($logo_size[1]/$logo_size[0]), $logo_size[0], $logo_size[1]);
-	} else{
-		imagecopyresampled($dest, $image_logo,  $logoxpos, 30, 0, 0, $logobreite, $logobreite*($logo_size[1]/$logo_size[0]), $logo_size[0], $logo_size[1]);
+if (isset ($_GET["designtemp"])){
+	if ($_GET["designtemp"] == "klar"){
+		$design = "klar";
 	}
+	if ($_GET["designtemp"] == "idnz"){
+		$design = "idnz";
+	}	
 }
 
-
-
-$kastenbreite = (1385 * $groessetext/100)/(1500/$bk_size[0]);
-$kastenhoehe = ($gesamt_kastenhoehe * $groessetext/100)/(1500/$bk_size[0]);
-
-if ($groessetext > 0){
-	if (isset ($_GET["prev"])){
-		imagecopyresized($dest, $image_kasten, ($bk_size[0]-$kastenbreite)/2, $bk_size[1]-$kastenhoehe-40, 0, 0, $kastenbreite, $kastenhoehe,1385,$gesamt_kastenhoehe);
-	} else{
-		imagecopyresampled($dest, $image_kasten, ($bk_size[0]-$kastenbreite)/2, $bk_size[1]-$kastenhoehe-40, 0, 0, $kastenbreite, $kastenhoehe,1385,$gesamt_kastenhoehe);
+// DESIGN-ELEMENTE EINFÜGEN
+// IN DIE NEUE ZEIT
+if ($design == "idnz"){
+	$i = substr_count($subline1, "\n");
+	$gesamt_kastenhoehe = 245 + 86*$i;
+	if ($subline1 == "") {$gesamt_kastenhoehe = 150;}
+	if (substr($subline1, -1) == "\n") {
+		$gesamt_kastenhoehe = $gesamt_kastenhoehe-86;
+		$i = $i - 1;
 	}
+	
+	// Logo einfügen
+	$image_logo = imagecreatefrompng($path_logo);
+	$logoxpos = 30;
+	if ($rechts == 1) {
+		$logoxpos = $bk_size[0] - $logobreite -30;
+	}
+	if ($logobreite > 0){
+		if (isset ($_GET["prev"])){
+			imagecopyresized($dest, $image_logo,  $logoxpos, 30, 0, 0, $logobreite, $logobreite*($logo_size[1]/$logo_size[0]), $logo_size[0], $logo_size[1]);
+		} else{
+			imagecopyresampled($dest, $image_logo,  $logoxpos, 30, 0, 0, $logobreite, $logobreite*($logo_size[1]/$logo_size[0]), $logo_size[0], $logo_size[1]);
+		}
+	}
+	imagedestroy($image_logo);	
+	// Kasten erzeugen
+	$image_kasten = imagecreatetruecolor (1385, $gesamt_kastenhoehe);
+	$bkcolor = imagecolorallocate ($image_kasten,255,255,255);
+	imagefill ($image_kasten,0,0,$bkcolor);
+	// Rose in Kasten einfügen
+	$image_kasten_icon = imagecreatefrompng("data/priv/icon-kasten.png");
+	if ($subline1 == "") {
+		$image_kasten_icon_kantenlange = 150;
+	} else {
+		$image_kasten_icon_kantenlange = 250; // 250
+	}
+	$image_logo_x = 0;
+	if (isset ($_GET["prev"])){
+		imagecopyresized ($image_kasten, $image_kasten_icon, 1385-$image_kasten_icon_kantenlange,$gesamt_kastenhoehe-$image_kasten_icon_kantenlange, 0,0, $image_kasten_icon_kantenlange,$image_kasten_icon_kantenlange,imagesx ($image_kasten_icon),imagesy ($image_kasten_icon));
+	} else{
+		imagecopyresampled ($image_kasten, $image_kasten_icon, 1385-$image_kasten_icon_kantenlange,$gesamt_kastenhoehe-$image_kasten_icon_kantenlange, 0,0, $image_kasten_icon_kantenlange,$image_kasten_icon_kantenlange,imagesx ($image_kasten_icon),imagesy ($image_kasten_icon));
+	}
+	// Text in Kasten einfügen
+	$headline=mb_strtoupper ($headline);
+	$headline = str_replace ("%S%","ß" ,$headline);
+	$subline1=mb_strtoupper ($subline1);
+	$subline1 = str_replace ("%S%","ß" ,$subline1);	
+	$color = imagecolorallocate($image_kasten, 227, 6, 19);
+	imagettftext($image_kasten, 55, 0, 40, 100, $color, realpath("data/priv/TheSans-B9Black.otf"), $headline);
+	imagettftext($image_kasten, 55, 0, 40, 190, $color, realpath("data/priv/TheSans-B7BoldItalic.otf"), $subline1);
+	// Kasten ins Bild legen
+	$kastenbreite = (1385 * $groessetext/100)/(1500/$bk_size[0]);
+	$kastenhoehe = ($gesamt_kastenhoehe * $groessetext/100)/(1500/$bk_size[0]);
+	if ($groessetext > 0){
+		if (isset ($_GET["prev"])){
+			imagecopyresized($dest, $image_kasten, ($bk_size[0]-$kastenbreite)/2, $bk_size[1]-$kastenhoehe-40, 0, 0, $kastenbreite, $kastenhoehe,1385,$gesamt_kastenhoehe);
+		} else{
+			imagecopyresampled($dest, $image_kasten, ($bk_size[0]-$kastenbreite)/2, $bk_size[1]-$kastenhoehe-40, 0, 0, $kastenbreite, $kastenhoehe,1385,$gesamt_kastenhoehe);
+		}
+	}
+	imagedestroy($image_kasten);	
+}
+// KLARE WORTE
+if ($design == "klar"){
+	$i = substr_count($subline1, "\n");
+	$gesamt_kastenhoehe = 140 + 86*$i;
+	if ($subline1 == "") {$gesamt_kastenhoehe = 150;}
+	if (substr($subline1, -1) == "\n") {
+		$gesamt_kastenhoehe = $gesamt_kastenhoehe-86;
+		$i = $i - 1;
+	}
+	
+	// Logo einfügen
+	$image_logo = imagecreatefrompng($path_logo);
+	$logoxpos = 30;
+	if ($rechts == 1) {
+		$logoxpos = $bk_size[0] - $logobreite -30;
+	}
+	if ($logobreite > 0){
+		if (isset ($_GET["prev"])){
+			imagecopyresized($dest, $image_logo,  $logoxpos, 30, 0, 0, $logobreite, $logobreite*($logo_size[1]/$logo_size[0]), $logo_size[0], $logo_size[1]);
+		} else{
+			imagecopyresampled($dest, $image_logo,  $logoxpos, 30, 0, 0, $logobreite, $logobreite*($logo_size[1]/$logo_size[0]), $logo_size[0], $logo_size[1]);
+		}
+	}
+	imagedestroy($image_logo);
+	
+	// Kasten erzeugen
+	$image_kasten = imagecreatetruecolor (1500, 1500);
+	$bkcolor = imageColorAllocateAlpha($image_kasten, 0, 0, 0, 127);
+	imagefill ($image_kasten,0,0,$bkcolor);	
+
+	// Fettes Wort in Bild legen
+	$headline = str_replace ("%S%","ß" ,$headline);
+	$subline1 = str_replace ("%S%","ß" ,$subline1);		
+	$headline_sub = explode (" ", $headline,2);
+	$headline_sub[0]=mb_strtoupper ($headline_sub[0]);
+	$color = imagecolorallocate($dest, 227, 1, 15);
+	$color_out = imagecolorallocate($image_kasten, 255, 255, 255);
+	//imagettftext($image_kasten, 200, 0, 0, $bk_size[1]/3, $color, realpath("data/priv/Tasman-Black.ttf"), $headline_sub[0]);
+	$textsize_head_array = imagettfbbox (200, 6, realpath("data/priv/Tasman-Black.ttf"), $headline_sub[0]);
+	$textsize_head = 200;
+	while ($textsize_head_array[2]-$textsize_head_array[0] > $bk_size[0]/(1500/1350)){
+		$textsize_head = $textsize_head - 1;
+		$textsize_head_array = imagettfbbox ($textsize_head, 0, realpath("data/priv/Tasman-Black.ttf"), $headline_sub[0]);
+	}
+
+	imagettfshadowtext ($image_kasten, $textsize_head, 0, 20, $textsize_head+30, $color, $color_out, realpath("data/priv/Tasman-Black.ttf"), $headline_sub[0], $textsize_head/10);
+
+	// weitere Worte aus Überschrift ins Bild legen
+	if (isset ($headline_sub[1])){
+		$color = imagecolorallocate($image_kasten, 0, 0, 0);
+		//imagettftext($image_kasten, 120, 0, 0, ($bk_size[1]/3)+160, $color, realpath("data/priv/Tasman-Medium.ttf"), $headline_sub[1]);
+		$textsize = 120;
+		$textsizearray = imagettfbbox ($textsize, 0, realpath("data/priv/Tasman-Black.ttf"), $headline_sub[1]);
+
+		while ($textsizearray[2]-$textsizearray[0] > $bk_size[0]/(1500/1350)){
+			$textsize = $textsize - 1;
+			$textsizearray = imagettfbbox ($textsize, 0, realpath("data/priv/Tasman-Black.ttf"), $headline_sub[1]);
+		}
+		imagettfshadowtext ($image_kasten, $textsize, 0, 20, $textsize_head+$textsize+80, $color, $color_out, realpath("data/priv/Tasman-Black.ttf"), $headline_sub[1], $textsize/10);
+	} else {
+		$textsize = -50;
+	}
+	
+	// Kasten ins Bild legen
+	$kastenbreite = 1500;
+	$kastenhoehe = $gesamt_kastenhoehe;
+	$image_white_bk = imagecreatetruecolor ($kastenbreite, $kastenhoehe);
+	$bkcolor = imageColorAllocateAlpha($image_white_bk, 255, 255, 255, 30);
+	imagefill ($image_white_bk,0,0,$bkcolor);
+	if ($subline1 != "") {
+		imagecopy ($image_kasten, $image_white_bk,20,$textsize_head+$textsize+140, 0,0,imagesx ($image_white_bk),imagesy ($image_white_bk));
+		imagesavealpha($image_white_bk, true);
+	} else {
+		$kastenhoehe = 0;
+	}
+	
+	// Unterschrift
+	$color = imagecolorallocate($image_kasten, 227, 1, 15);
+	imagettftext($image_kasten, 55, 0, 50, $textsize_head+$textsize+235, $color, realpath("data/priv/TheSans-B9Black.otf"), $subline1);
+	
+	// Drehen
+	$rotate = imagerotate ($image_kasten, 6, imageColorAllocateAlpha($image_kasten, 0, 0, 0, 127));
+	imagesavealpha($rotate, true);
+
+	//imagecopy ($dest, $rotate,0,$bk_size[1]/3-$textsize-$kastenhoehe+250, 0,0,imagesx ($rotate),imagesy ($rotate));
+	$pos_x = $bk_size[0]-((imagesx ($rotate)-150)*$groessetext/100);
+	if ($pos_x < 0) {$pos_x = 0;};
+	imagecopyresampled($dest, $rotate, $pos_x, $bk_size[1]-$textsize_head*$groessetext/100-$textsize*$groessetext/100-$kastenhoehe*$groessetext/100-340*$groessetext/100, 0, 0, imagesx ($rotate)*$groessetext/100, imagesy ($rotate)*$groessetext/100,imagesx ($rotate), imagesy ($rotate));
+
 }
 
-//imagecopy($dest, $image_kasten, 57, $bk_size[1]-400, 0, 0, $kastenbreite, $kastenhoehe);
-imagedestroy($image_kasten);
-//imagecopy($dest, $image_logo, 10, 10, 0, 0, 600, 600);
-imagedestroy($image_logo);
 
+
+// http://www.johnciacia.com/2010/01/04/using-php-and-gd-to-add-border-to-text/
+function imagettfstroketext(&$image, $size, $angle, $x, $y, &$textcolor, &$strokecolor, $fontfile, $text, $px) {
+	if (isset ($_GET["prev"])) {
+		$c1 = $x+abs($px);
+		$c2 = $y+abs($px);
+		$bg = imagettftext($image, $size, $angle, $c1, $c2, $strokecolor, $fontfile, $text);
+		
+		$c1 = $x-abs($px);
+		$c2 = $y-abs($px);
+		$bg = imagettftext($image, $size, $angle, $c1, $c2, $strokecolor, $fontfile, $text);
+	} else {
+		for($c1 = ($x-abs($px)); $c1 <= ($x+abs($px)); $c1++)
+			for($c2 = ($y-abs($px)); $c2 <= ($y+abs($px)); $c2++)
+				$bg = imagettftext($image, $size, $angle, $c1, $c2, $strokecolor, $fontfile, $text);
+
+	}
+    return imagettftext($image, $size, $angle, $x, $y, $textcolor, $fontfile, $text);
+}
+
+function imagettfshadowtext(&$image, $size, $angle, $x, $y, &$textcolor, &$strokecolor, $fontfile, $text, $px) {
+
+		$c1 = $x+abs($px);
+		$c2 = $y+abs($px);
+		$bg = imagettftext($image, $size, $angle, $c1, $c2, $strokecolor, $fontfile, $text);
+
+    return imagettftext($image, $size, $angle, $x, $y, $textcolor, $fontfile, $text);
+}
+
+// Ausgabe
 if (isset ($_GET["prev"])){
 	if ($bk_size[0]<$bk_size[1]){ // Hochformat
 		$faktor = $bk_size[0]/$bk_size[1];
@@ -422,13 +558,16 @@ if (isset ($_GET["prev"])){
 	imagecopyresized($smallver, $dest, 0,0,0,0,800,$bk_size[1]/1.875,1500,$bk_size[1]);
 
 	$colorprevtext = imagecolorallocate ($smallver,227, 19, 6);
-	
 
 	imagettftext($smallver, 20*$faktor, 0, 10*$faktor, ($bk_size[1]/1.875)+(30*$faktor), $colorprevtext, realpath("data/priv/TheSans-B7BoldItalic.otf"), "komprimierte Vorschau");
 	
 	if (!isset ($_GET["debug"])){header('Content-Type: image/jpeg');}
 	
-	imagejpeg($smallver, NULL, 40); 
+	if (!isset ($_GET["verysmall"])){
+		imagejpeg($smallver, NULL, 40);
+	} else {
+		imagejpeg($smallver, NULL, 5);
+	}
 
 	imagedestroy($dest);
 	imagedestroy($smallver);
@@ -444,9 +583,6 @@ if (isset ($_GET["prev"])){
 	imagefill ($smallver,0,0,$bkcolor);
 	imagecopyresampled($smallver, $dest, 0,0,0,0,$bk_size[0]/(1500/1050),$bk_size[1]/(1500/1050),1500*$faktor,$bk_size[1]);
 
-	
-
-	
 	if (!isset ($_GET["debug"])){header('Content-Type: image/jpeg');}
 	
 	imagejpeg($smallver, NULL, 100); 
@@ -460,8 +596,6 @@ else {
 	$hash = $db->querySingle('SELECT "Hash" FROM "sharepics" WHERE "ID" = "'.$id.'" ');
 	unset($db);
 
-	
-	
 	if (isset ($_GET["archiv"]) && $id_auth == TRUE && $conf_archiv==1){ // Bild archivieren
 		$db = new SQLite3("data/priv/database.sqlite");
 		$db->busyTimeout(5000);	
@@ -482,16 +616,10 @@ else {
 		}		
 				
 		$db->exec('INSERT INTO "archiv" ("time","IP","Hash", "Token") VALUES ("'.time().'","'.$_SERVER['REMOTE_ADDR'].'","'.$id.'", "'.hash ("sha3-224", $id.bin2hex(random_bytes(200))).'")');
-		
 		unset($db);
-
-	
 		imagejpeg($dest, "archiv/".$id.".jpg", 80);
-		imagedestroy($dest);
-		
-		
-		include "remove.php?id=".$id;
-		
+		imagedestroy($dest);	
+		include "remove.php?id=".$id;	
 		header ("Location: index.php?archivgesetzt&id=".$id);
 	} else {
 		if (!isset ($_GET["debug"])){header('Content-Type: image/jpeg');}
@@ -503,9 +631,5 @@ else {
 		imagejpeg($dest, NULL, 100);
 		imagedestroy($dest);
 	}
-
 }
-
-
-
 ?>
