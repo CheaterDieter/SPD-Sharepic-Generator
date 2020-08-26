@@ -32,6 +32,7 @@
 $ver = "1.7 Beta";
 
 include "data/config.php";
+
 $db = new SQLite3("data/priv/database.sqlite");
 $db->busyTimeout(5000);
 $db-> exec("CREATE TABLE IF NOT EXISTS 'sharepics' ('ID' TEXT, 'headline' TEXT, 'subline1' TEXT, 'Ablauf' INTEGER, 'IP' TEXT, 'Pfad_Hintergrund' TEXT, 'Pfad_Logo' TEXT,'groessetext' INTEGER, 'horizontal' INTEGER, 'logobreite' INTEGER, 'quad' INTEGER, 'rechts' INTEGER, 'vertikal' INTEGER, 'zoom' INTEGER, 'Hash' TEXT, 'Breite' INTEGER, 'Hoehe' INTEGER, 'Salt' TEXT, 'Archiv' INTEGER, 'Design' TEXT)");
@@ -81,6 +82,16 @@ if (!isset ($_GET["impdat"])){
 		$ok = 0;
 	}
 }
+
+if (isset ($_GET["komp"])) {
+	setcookie("komp", "1", time()+600);
+	header ("Location: index.php?id=".$id);
+}
+if (isset ($_GET["unkomp"])) {
+	setcookie("komp", "", time()-1);
+	header ("Location: index.php?id=".$id);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -146,8 +157,6 @@ elseif (isset ($_GET["archivgesetzt"])) {
 }
 elseif ($ok == 1) {
 	?>
-
-	
 	<form id="settings" target="transFrame" action="sharepic.php?iframe&prev&amp;id=<?php echo $id; ?>" method="post">
 	<div class="links">
 	<?php 
@@ -170,7 +179,7 @@ elseif ($ok == 1) {
 	
 	<?php if ($conf_archiv == 1) { echo '&nbsp;&nbsp;&nbsp;<a href="index.php?archiv&id='.$id.'">archivieren</a>'; } ?>
 	<br><br>
-	<div class="hidden" status="hidden">
+	<div class="hidden" status="<?php if (!isset ($_COOKIE["komp"])) {echo "hidden";} ?>">
 	<input class="enter" type="submit" value="Eingaben absenden und aktualisieren">
 	</div>
 	<div class="smalltext"><a href="remove.php?weiter&id=<?php echo ($id); ?>">oder meine Daten löschen und von vorne beginnen</a></div>
@@ -244,14 +253,14 @@ elseif ($ok == 1) {
 	<div class="rechts">
 	
 	<div class=head>ÜBERSCHRIFT</div>
-	<input oninput="absenden(1)" type="text" class="headline" id="headline" name="headline" value='<?php echo ($headline); ?>'>
+	<input oninput="<?php if (!isset ($_COOKIE["komp"])) {echo "absenden(1)";} ?>" type="text" class="headline" id="headline" name="headline" value='<?php echo ($headline); ?>'>
 	
 	<br>
 	<br>
 
 	<div class=head>UNTERSCHRIFT</div>
 	<div class="smalltext"><i>Soll der Text über mehrere Zeilen gehen, bitte Umbrüche setzen.</i></div>
-	<textarea oninput="absenden(1)" id="subline1" name="subline1" rows="3" cols="35"><?php echo ($subline1); ?></textarea>
+	<textarea oninput="<?php if (!isset ($_COOKIE["komp"])) {echo "absenden(1)";} ?>" id="subline1" name="subline1" rows="3" cols="35"><?php echo ($subline1); ?></textarea>
 	
 	<br>
 	<br>
@@ -381,7 +390,11 @@ elseif ($ok == 1) {
 
 	<div class="legal">
 	<br><br>
-	<div class="smalltext"><br>SPD Sharepic-Generator Version <?php echo ($ver); ?> entwickelt von David Heger, 2020<br>Diese Software ist OpenSource und unterliegt der GNU General Public License.<br><a href="https://github.com/CheaterDieter/SPD-Sharepic-Generator">Zum GitHub-Projekt</a><br><br><?php echo ($conf_copyright); ?><br><br></div>
+	<div class="smalltext">
+	<br>
+	<a href="index.php?id=<?php echo $_GET["id"];?><?php if (!isset($_COOKIE["komp"])) {echo "&komp";} else {echo "&unkomp";} ?>">Kompatibilitätsmodus <?php if (isset ($_COOKIE["komp"])) {echo "de";} ?>aktivieren</a>
+	<br><br>
+	<?php echo ($conf_titel . " Version " . $ver); ?> entwickelt von David Heger, 2020<br>Diese Software ist OpenSource und unterliegt der GNU General Public License.<br><a href="https://github.com/CheaterDieter/SPD-Sharepic-Generator">Zum GitHub-Projekt</a><br><br><?php echo ($conf_copyright); ?><br><br></div>
 	</div>
 	
 	<?php

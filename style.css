@@ -66,6 +66,9 @@ input.enter {
 	height: 50px;
 	background-color: #C1DFC4;
 	color: #951B81;
+	border-color: #ffffff;
+	border-width: 5px;
+	border-style: solid;
 }
 textarea {
 	font-size: 100%;
