@@ -32,6 +32,12 @@
 $ver = "1.7 Beta";
 
 include "data/config.php";
+include "phpqrcode.php";
+
+if (isset ($_GET["qr"])){
+	QRcode::png($_GET["qr"]);
+	exit();
+}
 
 $db = new SQLite3("data/priv/database.sqlite");
 $db->busyTimeout(5000);
@@ -84,7 +90,7 @@ if (!isset ($_GET["impdat"])){
 }
 
 if (isset ($_GET["komp"])) {
-	setcookie("komp", "1", time()+600);
+	setcookie("komp", "1", time()+31536000);
 	header ("Location: index.php?id=".$id);
 }
 if (isset ($_GET["unkomp"])) {
@@ -387,9 +393,10 @@ elseif ($ok == 1) {
 		<input class="upload" type="submit" value="hochladen" name="uploadLogo"> 
 	</form>
 	</div>
-
 	<div class="legal">
-	<br><br>
+	<br>
+		<img src="index.php?qr=<?php echo hash ("sha3-224", $id.$salt); ?>" alt="">
+	<br>
 	<div class="smalltext">
 	<br>
 	<a href="index.php?id=<?php echo $_GET["id"];?><?php if (!isset($_COOKIE["komp"])) {echo "&komp";} else {echo "&unkomp";} ?>">Kompatibilitätsmodus <?php if (isset ($_COOKIE["komp"])) {echo "de";} ?>aktivieren</a>
