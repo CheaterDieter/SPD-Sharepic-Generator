@@ -35,8 +35,23 @@ include "data/config.php";
 include "phpqrcode.php";
 
 if (isset ($_GET["qr"])){
-	QRcode::png($_GET["qr"]);
+	QRcode::png("http".(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on' ? 's':'')."://".$_SERVER['SERVER_NAME'].parse_url($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], PHP_URL_HOST).str_replace("index.php","sharepic.php", parse_url("https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], PHP_URL_PATH))."?hash=".$_GET["qr"]);
 	exit();
+}
+
+if (isset ($_GET["qrarchiv"])){
+	QRcode::png ("http".(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on' ? 's':'')."://".str_replace ("index.php", "" ,$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF']).'archiv/'.$_GET["qrarchiv"].'.jpg');
+	exit();
+}
+
+if ($conf_forcessl == 1){
+	if (!isset($_SERVER['HTTPS']) OR $_SERVER['HTTPS']!='on') {
+		$url = 'https://';
+		$url .= $_SERVER['HTTP_HOST'];
+		$url .= $_SERVER['REQUEST_URI']; // $url enthält jetzt die komplette URL
+		header ("Location: ".$url);
+		exit();
+	}
 }
 
 $db = new SQLite3("data/priv/database.sqlite");
@@ -116,7 +131,6 @@ if (isset ($_GET["unkomp"])) {
 <h2>Bitte aktivieren Sie JavaScript in Ihrem Browser, um diese Seite nutzen zu können.</h2><br><br>
 </noscript>
 <?php
-
 if (isset ($_GET["fehler"])) {
 	echo ("<h2>FEHLER:</h2><div class=head>".$_GET["fehler"]."</div><br><br>");
 }
@@ -146,8 +160,11 @@ elseif (isset ($_GET["archivgesetzt"])) {
 	Das Bild wurde ins Archiv verschoben.
 	<br>
 	<img id="prev" width="350" alt="" src="archiv/<?php echo $_GET["id"]; ?>.jpg">
+	<br>
+	<br>
+	<img class="qr" src="index.php?qrarchiv=<?php echo $_GET["id"]; ?>" alt="">
 	<br><br>
-	<textarea id="imgURL" style="width: 300px; height: 40px; font-size: 90%;" readonly="TRUE"><?php echo ("https://".str_replace ("index.php", "" ,$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'])); ?>archiv/<?php echo $_GET["id"]; ?>.jpg</textarea><br><br>
+	<textarea id="imgURL" style="width: 300px; height: 40px; font-size: 90%;" readonly="TRUE"><?php echo ("http".(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on' ? 's':'')."://".str_replace ("index.php", "" ,$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'])); ?>archiv/<?php echo $_GET["id"]; ?>.jpg</textarea><br><br>
 	<button onclick="copy()">In die Zwischenablage kopieren</button> 
 	<br><br>
 	<script>
@@ -395,7 +412,11 @@ elseif ($ok == 1) {
 	</div>
 	<div class="legal">
 	<br>
-		<img src="index.php?qr=<?php echo hash ("sha3-224", $id.$salt); ?>" alt="">
+	<?php
+	$qrurl = parse_url("https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'],  PHP_URL_HOST ).parse_url("https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], PHP_URL_PATH)."?qr=".hash ("sha3-224", $id.$salt);
+	echo ('<br><img class="qr" src="http'.(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on' ? 's':'').'://'.$qrurl.'" alt="">');
+	?>
+	<br><div class="qrtext">Über diesen QR-Code kannst du dein Bild z.B. am Handy abrufen.</div>
 	<br>
 	<div class="smalltext">
 	<br>

@@ -30,6 +30,17 @@
     Programm erhalten haben. Wenn nicht, siehe <https://www.gnu.org/licenses/>. 
 */  
 include "data/config.php";
+
+if ($conf_forcessl == 1){
+	if (!isset($_SERVER['HTTPS']) OR $_SERVER['HTTPS']!='on') {
+		$url = 'https://';
+		$url .= $_SERVER['HTTP_HOST'];
+		$url .= $_SERVER['REQUEST_URI']; // $url enthält jetzt die komplette URL
+		header ("Location: ".$url);
+		exit();
+	}
+}
+
 $login_passwort = $conf_password;
 
 

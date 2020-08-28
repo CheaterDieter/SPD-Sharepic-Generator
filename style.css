@@ -257,6 +257,12 @@ div.headline {
 	font-family: the-sansb;
 	font-size: 320%;
 }
+.qrtext {
+ line-height: 0;
+ font-size: 75%;
+ font-style: italic;
+}
+
 p {
 	margin-top: 0.0em;
 	margin-bottom: 1em;
