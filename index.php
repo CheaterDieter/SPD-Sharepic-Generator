@@ -29,7 +29,7 @@
     Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
     Programm erhalten haben. Wenn nicht, siehe <https://www.gnu.org/licenses/>. 
 */  
-$ver = "1.7 Beta";
+$ver = "1.7";
 
 include "data/config.php";
 include "phpqrcode.php";
