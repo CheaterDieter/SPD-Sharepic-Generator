@@ -9,7 +9,7 @@ Weitere Einstellungen: data/config.php
 
 ## Voraussetzungen
 - PHP 7
-- HTTPS
+- SQLite
 
 ## Lizenzinformationen - License information
 **Der Programmcode aller PHP, HTML und CSS-Dateien unterliegt der GNU General Public License.**
