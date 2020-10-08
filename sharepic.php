@@ -168,6 +168,12 @@ elseif(isset($_GET["id"])){
 		$tmp_str = SQLite3::escapeString ($tmp_str);
 		$db->exec('UPDATE "sharepics" SET "subline1"="'.$tmp_str.'" WHERE "ID"="'.$id.'"');
 	}
+	if (isset ($_POST["autor"])){
+		$tmp_str = str_replace ("ß","%S%" ,$_POST["autor"]);
+		$tmp_str = base64_encode ($tmp_str);
+		$tmp_str = SQLite3::escapeString ($tmp_str);
+		$db->exec('UPDATE "sharepics" SET "AUTOR"="'.$tmp_str.'" WHERE "ID"="'.$id.'"');
+	}	
 	if (isset ($_POST["logobreite"])){
 		$ins = SQLite3::escapeString ($_POST["logobreite"]);
 		if ($ins == 80){$ins=0;}
@@ -254,6 +260,7 @@ $result = $db->query('SELECT * FROM "sharepics" WHERE "ID" = "'.$id.'"');
 while ($row = $result->fetchArray())
 {
 	$headline = base64_decode ($row['headline']);
+	$autor = base64_decode ($row['AUTOR']);
 	$subline1 = base64_decode ($row['subline1']);
 	$subline1 = str_replace ("%br%","\n" ,$subline1);
 	$groessetext = $row['groessetext'];
@@ -361,6 +368,24 @@ if (isset ($_GET["designtemp"])){
 		$design = "idnz";
 	}	
 }
+
+
+$autor = str_replace ("%S%","ß" ,$autor);
+$white = imagecolorallocate($dest, 255, 255, 255);
+if ($bk_size[0]<$bk_size[1]){ // Hochformat
+	$faktor = $bk_size[0]/$bk_size[1];
+}
+else {
+	$faktor = 1;
+}
+if ($design != "klar"){
+	$xtext = 1490;
+} else {
+	$xtext = 25;
+}
+imagettftext ($dest, 20*$faktor, 90, $bk_size[0]/(1500/$xtext), $bk_size[1]/(1500/1490), $white, realpath("data/priv/TheSans-B9Black.otf"), $autor);
+
+	
 
 // DESIGN-ELEMENTE EINFÜGEN
 // IN DIE NEUE ZEIT

@@ -33,7 +33,7 @@ $conf_feedback_mail = "sharepic@spd-waghaeusel.de";
 
 // Archiv-Funktion aktiv
 // 1=aktiv		0=inaktiv
-$conf_archiv = 1;
+$conf_archiv = 0;
 
 // SSL erzwingen
 // 1=aktiv		0=inaktiv

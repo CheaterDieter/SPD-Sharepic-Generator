@@ -29,7 +29,7 @@
     Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
     Programm erhalten haben. Wenn nicht, siehe <https://www.gnu.org/licenses/>. 
 */  
-$ver = "1.7";
+$ver = "1.7.2";
 
 include "data/config.php";
 include "phpqrcode.php";
@@ -56,7 +56,7 @@ if ($conf_forcessl == 1){
 
 $db = new SQLite3("data/priv/database.sqlite");
 $db->busyTimeout(5000);
-$db-> exec("CREATE TABLE IF NOT EXISTS 'sharepics' ('ID' TEXT, 'headline' TEXT, 'subline1' TEXT, 'Ablauf' INTEGER, 'IP' TEXT, 'Pfad_Hintergrund' TEXT, 'Pfad_Logo' TEXT,'groessetext' INTEGER, 'horizontal' INTEGER, 'logobreite' INTEGER, 'quad' INTEGER, 'rechts' INTEGER, 'vertikal' INTEGER, 'zoom' INTEGER, 'Hash' TEXT, 'Breite' INTEGER, 'Hoehe' INTEGER, 'Salt' TEXT, 'Archiv' INTEGER, 'Design' TEXT)");
+$db-> exec("CREATE TABLE IF NOT EXISTS 'sharepics' ('ID' TEXT, 'headline' TEXT, 'subline1' TEXT, 'Ablauf' INTEGER, 'IP' TEXT, 'Pfad_Hintergrund' TEXT, 'Pfad_Logo' TEXT,'groessetext' INTEGER, 'horizontal' INTEGER, 'logobreite' INTEGER, 'quad' INTEGER, 'rechts' INTEGER, 'vertikal' INTEGER, 'zoom' INTEGER, 'Hash' TEXT, 'Breite' INTEGER, 'Hoehe' INTEGER, 'Salt' TEXT, 'Archiv' INTEGER, 'Design' TEXT, 'AUTOR' TEXT)");
 $db-> exec("CREATE TABLE IF NOT EXISTS 'vorlagen' ('name' TEXT, 'pfad_logo' TEXT, 'pfad_bk' TEXT, 'beschreibung' TEXT, 'Nr' INTEGER)");
 $db-> exec("CREATE TABLE IF NOT EXISTS 'archiv' ('time' TEXT, 'IP' TEXT, 'Hash' TEXT, 'Token' TEXT)");
 
@@ -270,6 +270,7 @@ elseif ($ok == 1) {
 		$rechts = $row['rechts'];
 		$vertikal = $row['vertikal'];
 		$zoom = $row['zoom'];
+		$autor = base64_decode ($row['AUTOR']);
 	}	
 	?>
 
@@ -379,6 +380,8 @@ elseif ($ok == 1) {
 	</div>
 	
 	</div>
+	<br>Autorenangabe: <input oninput="<?php if (!isset ($_COOKIE["komp"])) {echo "absenden(1)";} ?>" type="text" class="" id="autor" name="autor" value='<?php echo ($autor); ?>'>
+
 	</div>
 	</div>
 	</form>
@@ -393,9 +396,8 @@ elseif ($ok == 1) {
 	<form action="upload.php?id=<?php echo $_GET["id"]; ?>" method="post" enctype="multipart/form-data">
 		<div class="smalltext">nur JPG&amp;JPEG, max. 20 MB<br></div>
 		<input type="file" name="fileToUpload" id="fileToUpload">
-		<br>
-		<input class="upload" type="submit" value="hochladen" name="upload">  
-
+		<br><div class="smalltext"><i>Achtung Urheberrecht: Bei Bildern aus dem Internet prüfen, ob Weitergabe erlaubt ist! Ein*e Bildautor*in kann oben angegeben werden.</i></div>
+		<input class="upload" type="submit" value="hochladen" name="upload"><br>
 	</form>
 	<br>
 	<div class=head>LOGO</div>
@@ -403,11 +405,12 @@ elseif ($ok == 1) {
 	<img class="bkprev" width="150" alt="" src="prev.php?logo&amp;id=<?php echo ($id); ?>">
 	<a href="sharepic.php?rotatelogo=right&amp;id=<?php echo $_GET["id"];?>"><img width="25" alt="rechts drehen" src="rechts.png"></a>	
 	<br>
+	<input class="upload" type="submit" value="hochladen" name="uploadLogo"> 
+
 	<form action="upload.php?id=<?php echo $_GET["id"]; ?>" method="post" enctype="multipart/form-data">
 		<div class="smalltext">nur PNG, JPG&amp;JPEG, max. 10 MB<br></div>
 		<input type="file" name="fileToUploadLogo" id="fileToUploadLogo">
 		<br>
-		<input class="upload" type="submit" value="hochladen" name="uploadLogo"> 
 	</form>
 	</div>
 	<div class="legal">
