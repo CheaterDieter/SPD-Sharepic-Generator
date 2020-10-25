@@ -29,7 +29,7 @@
     Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
     Programm erhalten haben. Wenn nicht, siehe <https://www.gnu.org/licenses/>. 
 */  
-$ver = "1.7.1";
+$ver = "1.7.2";
 
 include "data/config.php";
 include "phpqrcode.php";
@@ -195,7 +195,7 @@ elseif ($ok == 1) {
 	$hoehe = round($hoehe/4.184782608695652/$faktor);
 	?>
 	<iframe scrolling="no" src="sharepic.php?iframe&prev&amp;id=<?php echo $id; ?>" style="border:0px;	width: 360px; height:<?php echo ($hoehe+10); ?>px;" name="transFrame" id="transFrame"></iframe>	
-	<div style="position: absolute;  width: 350px; z-index: -1; top: 200px;">
+	<div style="position: absolute;  width: 350px; z-index: -1; top: <?php if (isset ($_GET["fehler"])) {echo ("300");} else {echo ("200");}; ?>px;">
 		<img width=100 src="lade.gif">
 	</div>
 	<a href="sharepic.php?download&hash=<?php echo hash ("sha3-224", $id.$salt); ?>">Download</a>&nbsp;&nbsp;&nbsp;<a href="sharepic.php?hash=<?php echo hash ("sha3-224", $id.$salt); ?>">im Browser öffnen</a>
@@ -405,9 +405,9 @@ elseif ($ok == 1) {
 	<img class="bkprev" width="150" alt="" src="prev.php?logo&amp;id=<?php echo ($id); ?>">
 	<a href="sharepic.php?rotatelogo=right&amp;id=<?php echo $_GET["id"];?>"><img width="25" alt="rechts drehen" src="rechts.png"></a>	
 	<br>
-	<input class="upload" type="submit" value="hochladen" name="uploadLogo"> 
 
 	<form action="upload.php?id=<?php echo $_GET["id"]; ?>" method="post" enctype="multipart/form-data">
+		<input class="upload" type="submit" value="hochladen" name="uploadLogo"> 
 		<div class="smalltext">nur PNG, JPG&amp;JPEG, max. 10 MB<br></div>
 		<input type="file" name="fileToUploadLogo" id="fileToUploadLogo">
 		<br>
