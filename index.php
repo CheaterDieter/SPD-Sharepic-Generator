@@ -132,7 +132,7 @@ if (isset ($_GET["unkomp"])) {
 </noscript>
 <?php
 if (isset ($_GET["fehler"])) {
-	echo ("<h2>FEHLER:</h2><div class=head>".$_GET["fehler"]."</div><br><br>");
+	echo ("<h2>FEHLER:</h2><div class=head>".$_GET["fehler"].'.&nbsp;<a href="index.php?id='.$id.'">OK</a></div><br><br>');
 }
 
 if (isset ($_GET["impdat"])) {
