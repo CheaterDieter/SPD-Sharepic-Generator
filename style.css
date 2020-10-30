@@ -47,6 +47,17 @@ body {
 	text-align: center;
 	background-image:url("data/websitebk.png");
 }
+
+.footer {
+	background-color: #FFFFFF;
+	width: 100%;
+	color: #E70613;
+	position: fixed;
+	bottom: 0px;
+	left: 0px;
+	font-size: 90%;
+}
+
 hr {
 	color: #E30613;
 	background: #E30613;
