@@ -96,14 +96,15 @@ elseif(isset($_GET["id"])){
 		$result = $db->query('SELECT * FROM "vorlagen"');
 		while ($row = $result->fetchArray())
 		{
+			$vorlage_nr = $row['Nr'];
 			$vorlage_name = $row['name'];
 			$vorlage_pfad_logo = $row['pfad_logo'];
 			$vorlage_pfad_bk = $row['pfad_bk'];
 			
-			if ($vorlage_name == $_GET["vorlage"] && $vorlage_pfad_logo != "" && $_GET["lade"]=="logo"){
+			if ($vorlage_nr == $_GET["vorlage"] && $vorlage_pfad_logo != "" && $_GET["lade"]=="logo"){
 				copy ("data/vorlagen/".$vorlage_pfad_logo,$db->querySingle('SELECT "Pfad_Logo" FROM "sharepics" WHERE "ID" = "'.$id.'" '));
 			}
-			if ($vorlage_name == $_GET["vorlage"] && $vorlage_pfad_bk != "" && $_GET["lade"]=="bk"){
+			if ($vorlage_nr == $_GET["vorlage"] && $vorlage_pfad_bk != "" && $_GET["lade"]=="bk"){
 				copy ("data/vorlagen/".$vorlage_pfad_bk,$db->querySingle('SELECT "Pfad_Hintergrund" FROM "sharepics" WHERE "ID" = "'.$id.'" '));
 				$bk_size = getimagesize("data/vorlagen/".$vorlage_pfad_bk);
 				$db->exec('UPDATE "sharepics" SET "zoom"=0 WHERE "ID"="'.$id.'"');

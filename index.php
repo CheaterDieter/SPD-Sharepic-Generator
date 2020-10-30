@@ -238,8 +238,8 @@ elseif ($ok == 1) {
 				$beschreibung = $db->querySingle('SELECT "beschreibung" FROM "vorlagen" WHERE "Nr" = "'.$i.'" ');		
 
 				echo ('<td><div align="left">'.$vorlage_name.'</div></td>');
-				if ($vorlage_pfad_logo != "") {echo ('<td><a href="sharepic.php?vorlage='.str_replace(" ", "+", $vorlage_name).'&lade=logo&weiter&id='.$id.'">Logo</a></td>');}
-				if ($vorlage_pfad_bk != "") {echo ('<td><a href="sharepic.php?vorlage='.str_replace(" ", "+", $vorlage_name).'&lade=bk&weiter&id='.$id.'">Hintergrund</a></td>');}
+				if ($vorlage_pfad_logo != "") {echo ('<td><a href="sharepic.php?vorlage='.$i.'&lade=logo&weiter&id='.$id.'">Logo</a></td>');}
+				if ($vorlage_pfad_bk != "") {echo ('<td><a href="sharepic.php?vorlage='.$i.'&lade=bk&weiter&id='.$id.'">Hintergrund</a></td>');}
 				echo ("</tr>");
 				echo ('<tr><td colspan="3"><div align="left" style="font-size:80%; margin-bottom: 5px;"><i>'.$beschreibung.'</i></div></tr>');
 				
