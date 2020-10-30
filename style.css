@@ -58,6 +58,38 @@ body {
 	font-size: 90%;
 }
 
+.rose {
+	height:300px;
+	float: left;
+	position: fixed;
+	bottom: 0px;
+	left:0px;
+
+}
+@media (max-width: 1400px) {
+	.rose {
+		height:200px;
+	}
+}
+
+@media (max-width: 1250px) {
+	.rose {
+		height:100px;
+	}
+}
+
+@media (max-width: 1050px) {
+	.rose {
+		height:50px;
+	}
+}
+
+@media (max-width: 850px) {
+	.rose {
+		height:0px;
+	}
+}
+
 hr {
 	color: #E30613;
 	background: #E30613;

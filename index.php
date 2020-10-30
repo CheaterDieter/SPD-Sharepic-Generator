@@ -128,7 +128,11 @@ if (isset ($_GET["unkomp"])) {
 <div class="footer">
 <!-- Der SPD Sharepic-Generator wird ständig verbessert. Wenn Du einen Fehler findest, bitte melden.<br>Probleme bei der Bedienung am Handy? Dann aktiviere den Kompatibilitätsmodus. -->
 </div>
-<!--  -->
+
+<!-- Rose im Eck -->
+<img class="rose" src="data/rose-eck.png">
+
+
 <a href="index.php<?php if(isset($_GET["id"])){ echo ("?id=".$_GET["id"]); } ?>"><img id="ico" alt="" width="120" height="120" src="data/icon.jpg"></a>
 <!--<div class="headline"><?php echo ($conf_titel); ?></div>-->
 <br>
