@@ -275,7 +275,7 @@ if (isset ($_GET["vorlagen"])){
 ?>
 <br><br>
 <b>Neue Vorlage erstellen</b><br>
-<form action="/admin.php?vorlagen&save" method='post' enctype='multipart/form-data'>
+<form action="admin.php?vorlagen&save" method='post' enctype='multipart/form-data'>
 	Name*<br>
 	<input type="text" name="name"><br><br>
 	Logo<br>
