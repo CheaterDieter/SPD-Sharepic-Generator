@@ -43,6 +43,9 @@ if (isset ($_GET["design"]) && $_GET["id"]){
 	if ($_GET["design"] == "klar"){
 		$design = "klar";
 	}
+	if ($_GET["design"] == "ltw21"){
+		$design = "ltw21";
+	}	
 	if(strpos($_GET["id"],"'") != false or strpos($_GET["id"],'"') != false or strpos($_GET["id"],'’')  != false){die ("FEHLER<br>Ein potentieller Angriffsversuch auf diese Webseite wurde erkannt und blockiert.<br>Wenn dieser Fehler willkürlich auftritt, benachrichtichtigen Sie bitte den Administrator per Mail an sharepic@spd-waghaeusel.de");}
 	$ins = SQLite3::escapeString ($_GET["id"]);		
 	$db = new SQLite3("data/priv/database.sqlite");
@@ -384,7 +387,12 @@ if ($design != "klar"){
 } else {
 	$xtext = 25;
 }
-imagettftext ($dest, 20*$faktor, 90, $bk_size[0]/(1500/$xtext), $bk_size[1]/(1500/1490), $white, realpath("data/priv/TheSans-B9Black.otf"), $autor);
+if ($design != "ltw21"){
+	$ytext = 0;
+} else {
+	$ytext = 150;
+}
+imagettftext ($dest, 20*$faktor, 90, $bk_size[0]/(1500/$xtext), $bk_size[1]/(1500/1490)-$ytext, $white, realpath("data/priv/TheSans-B9Black.otf"), $autor);
 
 	
 
@@ -541,7 +549,88 @@ if ($design == "klar"){
 
 }
 
+// LTW21
+if ($design == "ltw21"){
+	// Logo einfügen
+	$image_logo = imagecreatefrompng($path_logo);
+	$logoxpos = 30;
+	if ($rechts == 1) {
+		$logoxpos = $bk_size[0] - $logobreite -30;
+	}
+	if ($logobreite > 0){
+		if (isset ($_GET["prev"])){
+			imagecopyresized($dest, $image_logo,  $logoxpos, 30, 0, 0, $logobreite, $logobreite*($logo_size[1]/$logo_size[0]), $logo_size[0], $logo_size[1]);
+		} else{
+			imagecopyresampled($dest, $image_logo,  $logoxpos, 30, 0, 0, $logobreite, $logobreite*($logo_size[1]/$logo_size[0]), $logo_size[0], $logo_size[1]);
+		}
+	}
+	imagedestroy($image_logo);
 
+	// Schrift ins Bild legen
+
+	if ($bk_size[0]<$bk_size[1]){ // Hochformat
+		$faktor = $bk_size[0]/$bk_size[1];
+	}
+	else {
+		$faktor = 1;
+	}
+
+	$subline1 = str_replace ("%S%","ß" ,$subline1);
+	$subline1=mb_strtoupper ($subline1);	
+
+	$color = imagecolorallocate($dest, 255, 255, 255);
+	
+/*
+                  $s = preg_split("[\n]", $subline1);
+                  $top=0;
+                  $left=($bk_size[1]-600)*$faktor;
+                  $font_file=realpath("data/priv/Druk-Medium-App.ttf");
+                  $fontsize=120*$faktor;
+               $__H=$top;
+               foreach($s as $key=>$val){
+                    $_b = imageTTFBbox($fontsize,0,$font_file,$val);
+                    $_W = abs($_b[2]-$_b[0]); 
+                    $_X = ($left+500)-$_W;
+                    $_H = abs($_b[5]-$_b[3]); 
+                    $_H +=1;  
+                    $__H += $_H;              
+                    $res=imagettftext($dest, $fontsize, 0, $_X, $__H, $color, $font_file, $val);
+                    $__H += 30;
+			   }
+	// imagettftext($dest, 100, 0, 50, 500, $color, realpath("data/priv/Druk-Medium-App.ttf"), $subline1);
+*/
+	$res=imagettftext($dest, 120*$faktor, 0, 10, 200, $color, realpath("data/priv/Druk-Medium-App.ttf"), $subline1);
+
+
+	// Kasten ins Bild legen
+	$kastenbreite = 1500;
+	$kastenhoehe = 150*$faktor;
+	$image_white_bk = imagecreatetruecolor ($kastenbreite, $kastenhoehe);
+	$bkcolor = imageColorAllocateAlpha($image_white_bk, 255, 255, 255, 0);
+	imagefill ($image_white_bk,0,0,$bkcolor);
+
+	imagecopy ($dest, $image_white_bk,0,$bk_size[1]-$kastenhoehe, 0,0,imagesx ($image_white_bk),imagesy ($image_white_bk));
+	imagesavealpha($image_white_bk, true);
+
+	// Text über Kasten
+	$bkcolor = imageColorAllocateAlpha($image_white_bk, 227, 1, 15, 0);
+	$fontsize=40*$faktor;
+	imagettftext($dest, $fontsize, 0, 20*$faktor, $bk_size[1]-($kastenhoehe/2)+($fontsize/2), $bkcolor, realpath("data/priv/TheSans-Plain.otf"), $headline);
+	
+	//Logo in Kasten
+	$image_logo = imagecreatefrompng("data/vorlagen/spd-mit-rose.png");
+	if (isset ($_GET["prev"])){
+		imagecopyresized($dest, $image_logo,  $bk_size[0]-(350/$faktor*$bk_size[0]/1500)*$faktor, $bk_size[1]-(130)*$faktor, 0, 0, 307*$faktor, 100*$faktor, 372, 121);
+	} else{
+		imagecopyresampled($dest, $image_logo,  $bk_size[0]-(350*$bk_size[0]/1500), $bk_size[1]-(130), 0, 0, 307, 100, 372, 121);
+	
+	}
+	
+//	$kastenbreite = (1385 * $groessetext/100)/(1500/$bk_size[0]);
+//	$kastenhoehe = ($gesamt_kastenhoehe * $groessetext/100)/(1500/$bk_size[0]);
+
+	
+}
 
 // http://www.johnciacia.com/2010/01/04/using-php-and-gd-to-add-border-to-text/
 function imagettfstroketext(&$image, $size, $angle, $x, $y, &$textcolor, &$strokecolor, $fontfile, $text, $px) {
