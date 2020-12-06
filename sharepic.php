@@ -567,7 +567,10 @@ if ($design == "ltw21"){
 	imagedestroy($image_logo);
 
 	// Schrift ins Bild legen
-
+	$image_kasten = imagecreatetruecolor ($bk_size[0], $bk_size[1]);
+	$bkcolor = imageColorAllocateAlpha($image_kasten, 0, 0, 0, 127);
+	imagefill ($image_kasten,0,0,$bkcolor);
+	
 	if ($bk_size[0]<$bk_size[1]){ // Hochformat
 		$faktor = $bk_size[0]/$bk_size[1];
 	}
@@ -578,8 +581,26 @@ if ($design == "ltw21"){
 	$subline1 = str_replace ("%S%","ß" ,$subline1);
 	$subline1=mb_strtoupper ($subline1);	
 
-	$color = imagecolorallocate($dest, 255, 255, 255);
-	
+	$i = substr_count($subline1, "\n");
+	$gesamt_kastenhoehe = 150*$faktor*$groessetext/100*$i + 95*$faktor*$i*$groessetext/100;
+
+	$color = imagecolorallocate($image_kasten, 255, 255, 255);
+	$textsize = imagettfbbox (150*$faktor*$groessetext/100, 0, realpath("data/priv/Druk-Medium-App.ttf"), $subline1);
+	$res=imagettftext($image_kasten, 150*$faktor*$groessetext/100, 0, 10, $bk_size[1]-200*$faktor-$gesamt_kastenhoehe, $color, realpath("data/priv/Druk-Medium-App.ttf"), $subline1);
+
+
+
+	$kastenbreite = $bk_size[0];
+	$kastenhoehe = $bk_size[1];
+	if ($groessetext > 0){
+		if (isset ($_GET["prev"])){
+			imagecopyresized($dest, $image_kasten, 0, 0, 0, 0, $bk_size[0], $bk_size[1],$bk_size[0],$bk_size[1]);
+		} else{
+			imagecopyresampled($dest, $image_kasten, 0, 0, 0, 0, $bk_size[0], $bk_size[1],$bk_size[0],$bk_size[1]);
+		}
+	}
+	imagedestroy($image_kasten);
+
 /*
                   $s = preg_split("[\n]", $subline1);
                   $top=0;
@@ -599,7 +620,6 @@ if ($design == "ltw21"){
 			   }
 	// imagettftext($dest, 100, 0, 50, 500, $color, realpath("data/priv/Druk-Medium-App.ttf"), $subline1);
 */
-	$res=imagettftext($dest, 120*$faktor, 0, 10, 200, $color, realpath("data/priv/Druk-Medium-App.ttf"), $subline1);
 
 
 	// Kasten ins Bild legen
