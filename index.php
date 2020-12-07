@@ -220,7 +220,7 @@ elseif ($ok == 1) {
 	<td><div class=head>DESIGN:</div></td>
 	<td><a href="sharepic.php?weiter&design=idnz&id=<?php echo $id; ?>"><img alt="" height=100 width=100 src="data/prev-neue-zeit.jpg"><br>Die neue Zeit</a></td>
 	<td><a href="sharepic.php?weiter&design=klar&id=<?php echo $id; ?>"><img alt="" height=100 width=100 src="data/prev-klare-worte.jpg"><br>Klare Worte</a></td>
-	<td><a href="sharepic.php?weiter&design=ltw21&id=<?php echo $id; ?>"><img alt="" height=100 width=100 src="data/prev-klare-worte.jpg"><br>LTW 21</a></td>
+	<td><a href="sharepic.php?weiter&design=ltw21&id=<?php echo $id; ?>"><img alt="" height=100 width=100 src="data/prev-ltw21.jpg"><br>LTW 21</a></td>
 	</tr>
 	</table>
 	<br>	
