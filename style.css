@@ -300,10 +300,12 @@ div.headline {
 	font-family: the-sansb;
 	font-size: 320%;
 }
-.qrtext {
- line-height: 0;
- font-size: 75%;
- font-style: italic;
+
+div.qrtext {
+	font-size: 60%;
+	margin-top: 0;
+	margin-bottom: 0;
+
 }
 
 p {

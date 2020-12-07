@@ -429,7 +429,7 @@ elseif ($ok == 1) {
 	$qrurl = parse_url("https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'],  PHP_URL_HOST ).parse_url("https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], PHP_URL_PATH)."?qr=".hash ("sha3-224", $id.$salt);
 	echo ('<br><img class="qr" src="http'.(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on' ? 's':'').'://'.$qrurl.'" alt="">');
 	?>
-	<br><div class="qrtext">Über diesen QR-Code kannst du dein Bild z.B. am Handy abrufen.</div>
+	<br><div class="qrtext"><i>Über diesen QR-Code kannst du dein Bild z.B. am Handy abrufen.</i></div>
 	<br>
 	<div class="smalltext">
 	<br>
